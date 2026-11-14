@@ -375,7 +375,8 @@ function renderStepTeoria(content, entry){
   // áudio de outro trecho da matéria; se esse arquivo específico ainda não foi
   // gerado, cai pro áudio da matéria inteira e, por fim, pra voz do navegador.
   const audioId = Array.isArray(raw) && entry.parte ? `${entry.materia}-parte${entry.parte}` : entry.materia;
-  const img = IMAGENS[entry.materia];
+  const imgRaw = IMAGENS[entry.materia];
+  const img = Array.isArray(imgRaw) ? (imgRaw[(entry.parte||1) - 1] || imgRaw[imgRaw.length-1]) : imgRaw;
   content.innerHTML = `
     ${img ? `<div class="theory-image"><img src="images/${img}" alt="Diagrama de apoio — ${MATERIA_LABEL[entry.materia]||''}" /></div>` : ""}
     <div id="theory-player-slot"></div>

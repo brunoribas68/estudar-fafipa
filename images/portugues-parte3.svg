@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 200" width="560" height="200">
+<rect width="560" height="200" fill="#eef9ff"/>
+<text x="280" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1cb0f6" font-family="Segoe UI, sans-serif">Funções sintáticas essenciais</text>
+<rect x="20" y="60" width="162" height="110" rx="12" fill="#ffffff" stroke="#1cb0f6" stroke-width="2.5"/>
+<rect x="20" y="60" width="162" height="6" rx="3" fill="#1cb0f6"/>
+<text x="101" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="101" dy="0">Sujeito</tspan></text>
+<text x="101" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="101" dy="0">quem pratica</tspan><tspan x="101" dy="14">a ação do verbo</tspan></text>
+<rect x="198" y="60" width="162" height="110" rx="12" fill="#ffffff" stroke="#58cc02" stroke-width="2.5"/>
+<rect x="198" y="60" width="162" height="6" rx="3" fill="#58cc02"/>
+<text x="279" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="279" dy="0">Objeto direto/indireto</tspan></text>
+<text x="279" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="279" dy="0">completa o verbo,</tspan><tspan x="279" dy="14">sem/com preposição</tspan></text>
+<rect x="376" y="60" width="162" height="110" rx="12" fill="#ffffff" stroke="#ffc800" stroke-width="2.5"/>
+<rect x="376" y="60" width="162" height="6" rx="3" fill="#ffc800"/>
+<text x="457" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="457" dy="0">Adjunto adnominal</tspan></text>
+<text x="457" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="457" dy="0">modifica o</tspan><tspan x="457" dy="14">substantivo</tspan></text>
+</svg>

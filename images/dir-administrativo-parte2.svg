@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 200" width="560" height="200">
+<rect width="560" height="200" fill="#eef9ff"/>
+<text x="280" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1cb0f6" font-family="Segoe UI, sans-serif">Dispensa × Inexigibilidade de licitação</text>
+<rect x="30" y="60" width="220" height="110" rx="12" fill="#ffffff" stroke="#58cc02" stroke-width="2.5"/>
+<rect x="30" y="60" width="220" height="6" rx="3" fill="#58cc02"/>
+<text x="140" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="140" dy="0">Dispensa</tspan></text>
+<text x="140" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="140" dy="0">licitação é viável,</tspan><tspan x="140" dy="14">mas a lei dispensa</tspan></text>
+<rect x="310" y="60" width="220" height="110" rx="12" fill="#ffffff" stroke="#ff4b4b" stroke-width="2.5"/>
+<rect x="310" y="60" width="220" height="6" rx="3" fill="#ff4b4b"/>
+<text x="420" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="420" dy="0">Inexigibilidade</tspan></text>
+<text x="420" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="420" dy="0">licitação é inviável</tspan><tspan x="420" dy="14">(fornecedor exclusivo)</tspan></text>
+<text x="280" y="123" text-anchor="middle" font-size="22" font-weight="800" fill="#ff4b4b" font-family="Segoe UI, sans-serif">×</text>
+</svg>

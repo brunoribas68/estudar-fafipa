@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 230" width="560" height="230">
+<rect width="560" height="230" fill="#eef9ff"/>
+<text x="280" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1cb0f6" font-family="Segoe UI, sans-serif">Remédios Constitucionais</text>
+<rect x="20" y="60" width="118" height="110" rx="12" fill="#ffffff" stroke="#1cb0f6" stroke-width="2.5"/>
+<rect x="20" y="60" width="118" height="6" rx="3" fill="#1cb0f6"/>
+<text x="79" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="79" dy="0">Habeas Corpus</tspan></text>
+<text x="79" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="79" dy="0">protege a</tspan><tspan x="79" dy="14">liberdade de ir e vir</tspan></text>
+<rect x="154" y="60" width="118" height="110" rx="12" fill="#ffffff" stroke="#58cc02" stroke-width="2.5"/>
+<rect x="154" y="60" width="118" height="6" rx="3" fill="#58cc02"/>
+<text x="213" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="213" dy="0">Mand. Segurança</tspan></text>
+<text x="213" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="213" dy="0">direito líquido</tspan><tspan x="213" dy="14">e certo</tspan></text>
+<rect x="288" y="60" width="118" height="110" rx="12" fill="#ffffff" stroke="#ffc800" stroke-width="2.5"/>
+<rect x="288" y="60" width="118" height="6" rx="3" fill="#ffc800"/>
+<text x="347" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="347" dy="0">Habeas Data</tspan></text>
+<text x="347" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="347" dy="0">acesso a dados</tspan><tspan x="347" dy="14">sobre si mesmo</tspan></text>
+<rect x="422" y="60" width="118" height="110" rx="12" fill="#ffffff" stroke="#ff9600" stroke-width="2.5"/>
+<rect x="422" y="60" width="118" height="6" rx="3" fill="#ff9600"/>
+<text x="481" y="106.19999999999999" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="481" dy="0">Ação Popular</tspan></text>
+<text x="481" y="130.2" text-anchor="middle" font-size="11" fill="#3c3c3c" opacity="0.8" font-family="Segoe UI, sans-serif"><tspan x="481" dy="0">qualquer cidadão,</tspan><tspan x="481" dy="14">patrimônio público</tspan></text>
+</svg>

@@ -238,13 +238,15 @@ governanca: `
 
 /* Diagrama de apoio (SVG original, gerado para este material) por matéria */
 const IMAGENS = {
-  portugues: "portugues.svg",
+  // matérias divididas em várias partes (ver `parte` em data.js) têm um
+  // infográfico por parte — array na mesma ordem das partes de TEORIA.
+  portugues: ["portugues-parte1.svg", "portugues-parte2.svg", "portugues-parte3.svg"],
   informatica: "informatica.svg",
   "leg-municipal": "leg-municipal.svg",
-  "dir-constitucional": "dir-constitucional.svg",
-  "dir-administrativo": "dir-administrativo.svg",
+  "dir-constitucional": ["dir-constitucional-parte1.svg", "dir-constitucional-parte2.svg"],
+  "dir-administrativo": ["dir-administrativo-parte1.svg", "dir-administrativo-parte2.svg"],
   raciocinio: "raciocinio.svg",
-  "dir-tributario": "dir-tributario.svg",
+  "dir-tributario": ["dir-tributario-parte1.svg", "dir-tributario-parte2.svg"],
   issqn: "issqn.svg",
   "demais-tributos": "demais-tributos.svg",
   "pat-reforma": "pat-reforma.svg",
