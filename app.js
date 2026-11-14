@@ -47,6 +47,38 @@ function toggleSpeak(html, btn){
   speakText(htmlToPlainText(html), btn);
 }
 
+/* ===================== ÁUDIO GRAVADO (voz natural do Google, gerada 1x) =====================
+   Se existir um .mp3 pré-gerado em /audio para a matéria (veja tools/generate-audio.js),
+   usa esse arquivo — é a voz boa. Se não existir (ainda não gerado, ou falhou ao carregar),
+   cai de volta na voz do navegador (toggleSpeak), que é pior mas sempre funciona. */
+let theoryAudioEl = null;
+function stopTheoryAudio(){
+  if(theoryAudioEl){ theoryAudioEl.pause(); theoryAudioEl = null; }
+}
+function toggleTheoryAudio(materia, html, btn){
+  if(theoryAudioEl && !theoryAudioEl.paused){
+    stopTheoryAudio();
+    btn.textContent = "🔊 Ouvir este conteúdo";
+    return;
+  }
+  if(window.speechSynthesis && window.speechSynthesis.speaking){
+    window.speechSynthesis.cancel();
+    btn.textContent = "🔊 Ouvir este conteúdo";
+    return;
+  }
+  btn.textContent = "⏳ Carregando áudio...";
+  const audio = new Audio(`audio/teoria-${materia}.mp3`);
+  theoryAudioEl = audio;
+  audio.addEventListener("playing", ()=>{ btn.textContent = "⏸️ Parar leitura"; });
+  audio.addEventListener("ended", ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; theoryAudioEl = null; });
+  audio.addEventListener("error", ()=>{
+    // sem áudio gravado pra esta matéria ainda — usa a voz do navegador
+    theoryAudioEl = null;
+    toggleSpeak(html, btn);
+  });
+  audio.play().catch(()=>{});
+}
+
 /* ===================== QUIZ ITEM (seleção + confirmação) =====================
    Antes, clicar numa alternativa já revelava a resposta na hora — fácil de
    responder errado sem querer. Agora: clica pra SELECIONAR, e só conta
@@ -225,7 +257,7 @@ function renderTrilhaStep(area){
       <div class="step-title-main">${STEP_LABEL[step]}</div>
       <div id="step-content"></div>
     </div>`;
-  document.getElementById("trilha-back").addEventListener("click", ()=>{ trilhaState=null; renderTrilha(); });
+  document.getElementById("trilha-back").addEventListener("click", ()=>{ window.speechSynthesis.cancel(); stopTheoryAudio(); trilhaState=null; renderTrilha(); });
 
   const content = document.getElementById("step-content");
   if(step==="teoria") renderStepTeoria(content, entry);
@@ -260,8 +292,8 @@ function renderStepTeoria(content, entry){
       <button class="btn-primary" id="step-next">Já li, continuar →</button>
     </div>`;
   initMiniTimer();
-  document.getElementById("speak-theory").addEventListener("click", (e)=> toggleSpeak(txt, e.target));
-  document.getElementById("step-next").addEventListener("click", ()=>{ window.speechSynthesis.cancel(); goToNextStep(entry); });
+  document.getElementById("speak-theory").addEventListener("click", (e)=> toggleTheoryAudio(entry.materia, txt, e.target));
+  document.getElementById("step-next").addEventListener("click", ()=>{ window.speechSynthesis.cancel(); stopTheoryAudio(); goToNextStep(entry); });
 }
 
 function renderStepFlashcards(content, entry){
