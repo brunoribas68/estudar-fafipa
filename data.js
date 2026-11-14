@@ -1,0 +1,394 @@
+/* ===================== CONFIG ===================== */
+const EXAM_DATE = "2026-12-06";
+
+/* ===================== CRONOGRAMA ===================== */
+// tipo: "novo" | "revisao" | "simulado" | "prova"
+const CRONOGRAMA = [
+  {data:"2026-11-02", tipo:"novo", materia:"portugues", topico:"Português: interpretação, variação linguística, gêneros, coesão/coerência"},
+  {data:"2026-11-03", tipo:"novo", materia:"portugues", topico:"Português: ortografia, classes de palavras, semântica"},
+  {data:"2026-11-04", tipo:"novo", materia:"portugues", topico:"Português: funções sintáticas, concordância, pontuação, porquês, literatura"},
+  {data:"2026-11-05", tipo:"novo", materia:"informatica", topico:"Informática completa"},
+  {data:"2026-11-06", tipo:"novo", materia:"leg-municipal", topico:"Legislação Municipal de Curitiba"},
+  {data:"2026-11-07", tipo:"novo", materia:"dir-constitucional", topico:"Direito Constitucional (parte 1)"},
+  {data:"2026-11-08", tipo:"revisao", materia:null, topico:"Revisão — sem conteúdo novo"},
+  {data:"2026-11-09", tipo:"novo", materia:"dir-constitucional", topico:"Direito Constitucional (parte 2)"},
+  {data:"2026-11-10", tipo:"novo", materia:"dir-administrativo", topico:"Direito Administrativo (parte 1)"},
+  {data:"2026-11-11", tipo:"novo", materia:"dir-administrativo", topico:"Direito Administrativo (parte 2)"},
+  {data:"2026-11-12", tipo:"novo", materia:"raciocinio", topico:"Raciocínio Lógico + Estatística + Matemática Financeira"},
+  {data:"2026-11-13", tipo:"novo", materia:"dir-tributario", topico:"Direito Tributário, Teoria Geral (parte 1)"},
+  {data:"2026-11-14", tipo:"novo", materia:"dir-tributario", topico:"Direito Tributário, Teoria Geral (parte 2)"},
+  {data:"2026-11-15", tipo:"revisao", materia:null, topico:"Revisão — sem conteúdo novo"},
+  {data:"2026-11-16", tipo:"novo", materia:"issqn", topico:"ISSQN"},
+  {data:"2026-11-17", tipo:"novo", materia:"demais-tributos", topico:"Demais Tributos Municipais + Legislação Tributária de Curitiba"},
+  {data:"2026-11-18", tipo:"novo", materia:"pat-reforma", topico:"Processo Administrativo Tributário + Reforma Tributária do Consumo"},
+  {data:"2026-11-19", tipo:"novo", materia:"contabilidade", topico:"Contabilidade (parte 1)"},
+  {data:"2026-11-20", tipo:"novo", materia:"contab-publica", topico:"Contabilidade Pública / Orçamento Público"},
+  {data:"2026-11-21", tipo:"novo", materia:"civil-empresarial", topico:"Direito Civil / Empresarial"},
+  {data:"2026-11-22", tipo:"revisao", materia:null, topico:"Revisão — sem conteúdo novo"},
+  {data:"2026-11-23", tipo:"novo", materia:"penal-lrf", topico:"Direito Penal Tributário + Finanças Públicas (LRF)"},
+  {data:"2026-11-24", tipo:"novo", materia:"economia", topico:"Economia + metodologias de pesquisa econômica"},
+  {data:"2026-11-25", tipo:"novo", materia:"informatica", topico:"TI aplicada à fiscalização (revisão aprofundada)"},
+  {data:"2026-11-26", tipo:"novo", materia:"governanca", topico:"Governança"},
+  {data:"2026-11-27", tipo:"revisao", materia:"dir-tributario", topico:"Revisão geral: Direito Tributário completo"},
+  {data:"2026-11-28", tipo:"revisao", materia:"portugues", topico:"Revisão geral: Português + Informática"},
+  {data:"2026-11-29", tipo:"revisao", materia:null, topico:"Revisão — sem conteúdo novo"},
+  {data:"2026-11-30", tipo:"revisao", materia:"dir-administrativo", topico:"Revisão geral: Const./Administrativo"},
+  {data:"2026-12-01", tipo:"revisao", materia:"contabilidade", topico:"Revisão geral: Contabilidade/Orçamento/Economia"},
+  {data:"2026-12-02", tipo:"simulado", materia:null, topico:"Simulado completo (estilo FAFIPA)"},
+  {data:"2026-12-03", tipo:"revisao", materia:null, topico:"Revisão dirigida (pontos fracos do simulado)"},
+  {data:"2026-12-04", tipo:"revisao", materia:null, topico:"Revisão leve + descanso mental"},
+  {data:"2026-12-05", tipo:"revisao", materia:null, topico:"Véspera — leitura leve, sem conteúdo novo"},
+  {data:"2026-12-06", tipo:"prova", materia:null, topico:"PROVA — Auditor Fiscal de Tributos Municipais"},
+];
+
+const MATERIA_LABEL = {
+  "portugues":"Língua Portuguesa",
+  "informatica":"Noções de Informática",
+  "leg-municipal":"Legislação Municipal",
+  "dir-constitucional":"Direito Constitucional",
+  "dir-administrativo":"Direito Administrativo",
+  "raciocinio":"Raciocínio Lógico / Estatística / Mat. Financeira",
+  "dir-tributario":"Direito Tributário (Teoria Geral)",
+  "issqn":"ISSQN",
+  "demais-tributos":"Demais Tributos + Leg. Tributária Curitiba",
+  "pat-reforma":"Processo Adm. Tributário + Reforma Tributária",
+  "contabilidade":"Contabilidade",
+  "contab-publica":"Contabilidade Pública / Orçamento Público",
+  "civil-empresarial":"Direito Civil / Empresarial",
+  "penal-lrf":"Direito Penal Tributário / LRF",
+  "economia":"Economia / Pesquisa Econômica",
+  "governanca":"Governança"
+};
+
+/* ===================== FLASHCARDS ===================== */
+// grade usa SM-2 simplificado: 0=difícil,1=médio,2=fácil
+let idc = 1;
+function fc(materia, pergunta, resposta){ return {id:"fc"+(idc++), materia, pergunta, resposta}; }
+
+const FLASHCARDS = [
+  // Português
+  fc("portugues","O que é coesão textual?","É a ligação gramatical entre as partes do texto (uso de pronomes, conectivos, repetição controlada) que garante que as frases se encadeiem."),
+  fc("portugues","Diferencie coesão de coerência.","Coesão é a ligação gramatical/lexical entre as partes do texto; coerência é o sentido lógico global, a compreensão unificada do texto como um todo."),
+  fc("portugues","Cite 3 tipos de gêneros textuais comuns em provas.","Narrativo, dissertativo-argumentativo, descritivo, injuntivo (instrucional), expositivo."),
+  fc("portugues","Qual a regra geral do 'porquê' separado e com acento, no fim de frase?","'Por que' (separado, sem acento) é usado em perguntas e antes de substantivo oculto; 'porquê' (junto, com acento) é substantivo, geralmente antecedido de artigo: 'o porquê'."),
+  fc("portugues","O que é concordância verbal com sujeito composto anteposto ao verbo?","O verbo geralmente vai para o plural quando o sujeito composto vem antes dele: 'João e Maria chegaram'."),
+  fc("portugues","Dê um exemplo de função sintática do predicativo do sujeito.","Em 'A água é a mãe', 'a mãe' é predicativo do sujeito — atribui uma característica/identidade ao sujeito através de verbo de ligação."),
+
+  // Informática
+  fc("informatica","Diferencie hardware de software.","Hardware é a parte física do computador (CPU, memória, periféricos); software é o conjunto de programas e sistemas que o fazem funcionar."),
+  fc("informatica","O que faz o atalho Ctrl+F?","Abre a caixa de localizar/buscar palavra em um documento ou página."),
+  fc("informatica","O que é uma referência absoluta no Excel? Dê a notação.","É uma referência de célula que não muda ao copiar a fórmula para outras células; é fixada com o símbolo de cifrão antes da letra e do número (ex.: coluna e linha fixas)."),
+  fc("informatica","O que é phishing?","Fraude em que o golpista se passa por instituição confiável para obter dados pessoais via e-mail ou link falso."),
+  fc("informatica","HTTPS garante o quê na navegação?","Uma conexão criptografada entre o navegador e o servidor, protegendo os dados transmitidos."),
+  fc("informatica","O que são 'alucinações' em IA generativa?","Respostas geradas com aparência de certeza, mas que contêm informações incorretas — por isso sempre exigem verificação humana."),
+
+  // Legislação Municipal
+  fc("leg-municipal","O que é a Lei Orgânica do Município?","É a norma fundamental de organização político-administrativa do Município, equivalente a uma 'Constituição' municipal."),
+  fc("leg-municipal","Qual lei trata do Estatuto dos Funcionários Públicos de Curitiba?","A Lei Municipal nº 1.656/1958."),
+  fc("leg-municipal","O que a Lei Municipal 7.671/1991 organiza?","A estrutura administrativa do Poder Executivo de Curitiba (secretarias e órgãos)."),
+  fc("leg-municipal","Quem fiscaliza as contas do Município?","A Câmara Municipal, com auxílio do Tribunal de Contas do Estado."),
+  fc("leg-municipal","O que caracteriza a autonomia municipal?","Auto-organização (lei orgânica própria), autogoverno, autolegislação e autoadministração."),
+  fc("leg-municipal","O Município tem Poder Judiciário próprio?","Não. A Justiça é estadual ou federal; o Município só tem Executivo e Legislativo."),
+
+  // Direito Constitucional
+  fc("dir-constitucional","Quais são os princípios da Administração Pública no art. 37 da CF? (sigla)","LIMPE: Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência."),
+  fc("dir-constitucional","Quando o servidor efetivo adquire estabilidade?","Após 3 anos de efetivo exercício, com avaliação de desempenho satisfatória."),
+  fc("dir-constitucional","A responsabilidade civil do Estado é objetiva ou subjetiva?","Objetiva — independe de culpa do agente; cabe direito de regresso contra o agente em caso de dolo ou culpa."),
+  fc("dir-constitucional","Quais são as formas de Estado e de governo do Brasil?","Forma de Estado: federativa. Forma de governo: república. Sistema: presidencialista."),
+  fc("dir-constitucional","O que garante o mandado de segurança?","Protege direito líquido e certo não amparado por habeas corpus ou habeas data."),
+  fc("dir-constitucional","Cite os entes da organização político-administrativa (art. 18, CF).","União, Estados, Distrito Federal e Municípios, todos autônomos."),
+
+  // Direito Administrativo
+  fc("dir-administrativo","Diferencie anulação de revogação.","Anulação extingue ato ilegal, com efeito retroativo (ex tunc). Revogação extingue ato legal mas inconveniente, com efeito ex nunc, e só a Administração pode revogar."),
+  fc("dir-administrativo","O que é presunção de legitimidade do ato administrativo?","O ato se presume legal e verdadeiro até prova em contrário."),
+  fc("dir-administrativo","O que é poder de polícia?","Poder da Administração de limitar o exercício de direitos individuais em favor do interesse coletivo (ex.: fiscalização sanitária, tributária)."),
+  fc("dir-administrativo","Diferencie ato vinculado de ato discricionário.","No vinculado a lei não deixa margem de escolha; no discricionário há margem de escolha quanto a oportunidade e conveniência, dentro dos limites legais."),
+  fc("dir-administrativo","O que mudou na Lei de Improbidade (LIA) com a reforma de 2021 para danos ao erário?","Passou a exigir dolo (não basta mais culpa) para caracterizar ato de improbidade que causa prejuízo ao erário."),
+  fc("dir-administrativo","Qual a modalidade padrão de licitação para bens e serviços comuns (Lei 14.133/2021)?","Pregão."),
+
+  // Raciocínio Lógico / Estatística / Mat. Financeira
+  fc("raciocinio","Qual a negação de 'Todo A é B'?","'Algum A não é B'."),
+  fc("raciocinio","Quando uma proposição condicional 'se P, então Q' é falsa?","Somente quando P é verdadeiro e Q é falso."),
+  fc("raciocinio","Diferencie moda de mediana.","Moda é o valor mais frequente; mediana é o valor central de um conjunto ordenado de dados."),
+  fc("raciocinio","Juros compostos incidem sobre o quê a cada período?","Sobre o montante acumulado (capital + juros já incorporados), e não apenas sobre o capital inicial."),
+  fc("raciocinio","O que mede o desvio padrão?","O quanto, em média, os dados se afastam do valor central (média) — é a principal medida de dispersão."),
+
+  // Direito Tributário
+  fc("dir-tributario","Qual a definição legal de tributo (art. 3º CTN)?","Prestação pecuniária compulsória, em moeda, que não constitua sanção de ato ilícito, instituída em lei e cobrada por atividade administrativa plenamente vinculada."),
+  fc("dir-tributario","Diferencie competência tributária de capacidade tributária ativa.","Competência (criar o tributo) é indelegável; capacidade tributária ativa (cobrar/fiscalizar/arrecadar) pode ser delegada a outra pessoa jurídica de direito público."),
+  fc("dir-tributario","Diferencie decadência de prescrição tributária.","Decadência extingue o direito de lançar (constituir) o crédito; prescrição extingue o direito de cobrar/executar o crédito já constituído. Ambas em 5 anos."),
+  fc("dir-tributario","Cite as causas de suspensão do crédito tributário (art. 151 CTN).","Moratória, depósito do montante integral, reclamações/recursos administrativos, liminar/tutela antecipada, parcelamento."),
+  fc("dir-tributario","Quais são as causas de exclusão do crédito tributário (art. 175 CTN)?","Isenção e anistia."),
+  fc("dir-tributario","O que é lançamento por homologação? Dê um exemplo municipal.","O contribuinte apura e paga antecipadamente, sujeito a homologação posterior do fisco; exemplo: ISSQN na maioria dos municípios."),
+
+  // ISSQN
+  fc("issqn","Qual a base normativa nacional do ISSQN e as alíquotas mínima/máxima?","Lei Complementar 116/2003; alíquota mínima de 2% (EC 37/2002) e máxima de 5%."),
+  fc("issqn","Como regra geral, em qual município o ISSQN é devido?","No município do estabelecimento prestador do serviço."),
+  fc("issqn","Em que casos o ISSQN é devido no município da execução, e não do estabelecimento?","Em serviços como construção civil, limpeza, vigilância e exploração de rodovia (exceções do art. 3º da LC 116/2003)."),
+  fc("issqn","O ISSQN incide sobre exportação de serviços?","Não incide sobre exportação de serviços para o exterior, salvo se o resultado se verificar no Brasil."),
+  fc("issqn","O que é retenção na fonte do ISSQN?","Hipótese em que o tomador do serviço é responsável tributário e deve reter e recolher o ISSQN em nome do prestador."),
+
+  // Demais tributos municipais
+  fc("demais-tributos","Qual o fato gerador do IPTU?","Propriedade, domínio útil ou posse de bem imóvel em zona urbana do município."),
+  fc("demais-tributos","Qual o fato gerador do ITBI?","Transmissão onerosa, por ato inter vivos, de bens imóveis ou direitos reais sobre imóveis."),
+  fc("demais-tributos","O ITBI incide sobre herança ou doação?","Não — esses casos são de competência estadual (ITCMD)."),
+  fc("demais-tributos","O que é contribuição de melhoria e qual seu limite total?","Tributo cobrado pela valorização imobiliária decorrente de obra pública; limite total é o custo da obra."),
+  fc("demais-tributos","Diferencie taxa de serviço de taxa de polícia.","Taxa de serviço vincula-se a serviço público específico e divisível; taxa de polícia vincula-se ao exercício do poder de polícia/fiscalização."),
+
+  // PAT + Reforma Tributária
+  fc("pat-reforma","O que é 'impugnação' no processo administrativo tributário?","É a defesa apresentada pelo contribuinte contra o auto de infração/lançamento, dentro do prazo legal."),
+  fc("pat-reforma","Qual o efeito da impugnação tempestiva sobre o crédito tributário?","Suspende sua exigibilidade (art. 151, III, CTN) enquanto pendente de decisão administrativa."),
+  fc("pat-reforma","O que é inscrição em dívida ativa?","Ato que, após esgotadas as instâncias administrativas sem pagamento, confere ao crédito liquidez, certeza e exigibilidade, permitindo a execução fiscal."),
+  fc("pat-reforma","Quais tributos serão substituídos pelo IBS e pela CBS?","ICMS (estadual), ISSQN (municipal) e PIS/Cofins (federais), ao final da transição da Reforma Tributária (EC 132/2023)."),
+  fc("pat-reforma","O que é o 'princípio do destino' na Reforma Tributária?","O novo IBS será cobrado no município onde o bem/serviço é consumido, e não mais na origem."),
+
+  // Contabilidade
+  fc("contabilidade","Qual a equação fundamental da contabilidade?","Ativo = Passivo + Patrimônio Líquido."),
+  fc("contabilidade","O que é o método das partidas dobradas?","Todo lançamento contábil envolve, no mínimo, uma conta debitada e uma creditada, de valores iguais."),
+  fc("contabilidade","Nas contas de ativo, os aumentos ocorrem a débito ou a crédito?","A débito."),
+  fc("contabilidade","Diferencie regime de competência de regime de caixa.","Competência reconhece receitas/despesas quando ocorrem, independente do pagamento; caixa reconhece apenas no recebimento/pagamento efetivo."),
+  fc("contabilidade","Qual demonstração evidencia a posição patrimonial e financeira em uma data específica?","O Balanço Patrimonial."),
+
+  // Contabilidade Pública / Orçamento
+  fc("contab-publica","Qual lei disciplina a elaboração e o controle dos orçamentos públicos no Brasil?","A Lei 4.320/1964."),
+  fc("contab-publica","Quais são as 3 leis do ciclo orçamentário?","PPA (Plano Plurianual, 4 anos), LDO (Lei de Diretrizes Orçamentárias, anual) e LOA (Lei Orçamentária Anual)."),
+  fc("contab-publica","O que estabelece a Lei de Responsabilidade Fiscal (LC 101/2000)?","Limites de gastos com pessoal, metas fiscais, exigências de transparência e regras para geração de despesa."),
+  fc("contab-publica","Dê um exemplo de receita de capital.","Operações de crédito, alienação de bens."),
+  fc("contab-publica","O que é o princípio orçamentário da unidade?","Todas as receitas e despesas devem constar em uma única lei orçamentária."),
+
+  // Civil/Empresarial e Penal/LRF
+  fc("civil-empresarial","O que caracteriza o empresário, segundo o Código Civil?","Quem exerce profissionalmente atividade econômica organizada para produção/circulação de bens ou serviços."),
+  fc("civil-empresarial","O que é o Simples Nacional?","Regime unificado de tributação para microempresas e pequenas empresas, com partilha de receitas entre os entes, inclusive do ISSQN."),
+  fc("penal-lrf","O que caracteriza crime contra a ordem tributária (Lei 8.137/1990)?","Fraude, omissão ou declaração falsa com o objetivo de suprimir ou reduzir tributo — não basta o simples inadimplemento."),
+  fc("penal-lrf","O pagamento integral do tributo após a denúncia pode extinguir a punibilidade?","Sim, conforme entendimento consolidado sobre crimes contra a ordem tributária."),
+  fc("penal-lrf","O que tipifica a Lei 10.028/2000 (Lei de Crimes Fiscais)?","Condutas que violam a LRF, como operação de crédito sem autorização legislativa ou despesa não autorizada."),
+
+  // Economia
+  fc("economia","O que mede o PIB?","A produção total de bens e serviços de uma economia em determinado período."),
+  fc("economia","Diferencie política fiscal de política monetária.","Fiscal atua via gastos públicos e tributação; monetária atua via controle da oferta de moeda e taxa de juros (Banco Central)."),
+  fc("economia","O que é fiscalização orientada por risco?","Uso de indicadores estatísticos para priorizar contribuintes com maior probabilidade de irregularidade fiscal."),
+  fc("economia","O que é cruzamento de dados (data matching) na fiscalização?","Comparação entre dados declarados pelo contribuinte e informações de terceiros (bancos, cartões) para identificar indícios de sonegação."),
+
+  // Governança
+  fc("governanca","Quais as 3 dimensões clássicas da governança pública?","Liderança, estratégia e controle."),
+  fc("governanca","Diferencie governança de gestão.","Governança define diretrizes ('fazer a coisa certa'); gestão executa operacionalmente ('fazer certo a coisa')."),
+  fc("governanca","O que é accountability?","Responsabilização dos agentes públicos por suas decisões e resultados; sinônimo de prestação de contas."),
+  fc("governanca","Quem exerce o controle externo sobre o Executivo municipal?","O Poder Legislativo (Câmara Municipal), com auxílio do Tribunal de Contas."),
+];
+
+/* ===================== QUIZ (estilo FAFIPA) ===================== */
+let idq = 1;
+function qz(materia, enunciado, opcoes, correta, explicacao){
+  return {id:"q"+(idq++), materia, enunciado, opcoes, correta, explicacao};
+}
+
+const QUIZZES = [
+  // Português
+  qz("portugues","Assinale a alternativa que define corretamente 'coerência textual':",
+    ["A repetição de palavras ao longo do texto.","A ligação lógica de sentido entre as ideias do texto como um todo.","O uso exclusivo de conectivos.","A ortografia correta das palavras.","A pontuação adequada de cada frase."],
+    1,"Coerência é a unidade de sentido do texto; coesão é a ligação gramatical entre as partes."),
+  qz("portugues","Em 'Mas a enchente também traz destruição', o conectivo 'mas' estabelece relação de:",
+    ["Adição","Conclusão","Oposição/contraste","Causa","Finalidade"],
+    2,"'Mas' é conjunção adversativa, indicando contraste/oposição entre as ideias."),
+  qz("portugues","Sobre o uso de 'porquê' (junto, com acento), é correto afirmar que:",
+    ["É sempre usado em perguntas diretas.","Funciona como substantivo, geralmente precedido de artigo ('o porquê').","É usado antes de verbos no infinitivo.","Nunca é usado em frases afirmativas.","É sinônimo de 'por que' em qualquer contexto."],
+    1,"'Porquê' junto e acentuado é substantivo, equivalente a 'motivo', e normalmente vem com artigo."),
+  qz("portugues","Analise: I. Gêneros textuais variam conforme a função social do texto. II. Tipologia textual refere-se à estrutura (narrar, descrever, argumentar). III. Coesão garante apenas a correção ortográfica. Está(ão) correta(s):",
+    ["Apenas I","Apenas II","Apenas I e II","Apenas III","I, II e III"],
+    2,"I e II estão corretas; III está errada, pois coesão trata da ligação textual, não de ortografia."),
+
+  // Informática
+  qz("informatica","A memória que perde seu conteúdo quando o computador é desligado é a:",
+    ["HD","SSD","RAM","Memória ROM","Pendrive"],
+    2,"RAM é memória volátil, perdendo os dados ao desligar o equipamento."),
+  qz("informatica","No Excel, uma referência fixada com cifrão antes da letra e do número, que não muda ao copiar a fórmula, é chamada de referência:",
+    ["Relativa","Absoluta","Mista apenas na coluna","Circular","Dinâmica"],
+    1,"Referência absoluta é fixada com cifrão e não se altera ao copiar a fórmula."),
+  qz("informatica","Phishing é uma fraude caracterizada por:",
+    ["Criptografia de dados sensíveis","Bloqueio de tráfego de rede por firewall","Cópia de segurança de arquivos","Golpista se passar por instituição confiável para obter dados","Compactação de arquivos grandes"],
+    3,"Phishing é a fraude de engenharia social via e-mail/link falso, imitando instituição confiável."),
+  qz("informatica","Sobre ferramentas de IA generativa (ChatGPT, Copilot, Gemini), é correto afirmar que:",
+    ["Nunca cometem erros","Substituem integralmente o julgamento humano","Podem gerar respostas incorretas com aparência de certeza, exigindo verificação","São idênticas a buscadores tradicionais","Só funcionam offline"],
+    2,"Modelos de IA generativa podem 'alucinar', produzindo informações incorretas que parecem corretas."),
+
+  // Legislação Municipal
+  qz("leg-municipal","A norma que organiza a estrutura político-administrativa do Município, equivalente a uma 'Constituição' local, é:",
+    ["O Código Tributário Municipal","A Lei Orgânica do Município","O Regimento Interno da Câmara","O Estatuto dos Servidores","A Lei de Diretrizes Orçamentárias"],
+    1,"Lei Orgânica é a norma fundamental de organização do Município."),
+  qz("leg-municipal","O Estatuto dos Funcionários Públicos de Curitiba está previsto em qual lei?",
+    ["Lei Municipal nº 7.671/1991","Lei Municipal nº 1.656/1958","Lei Orgânica do Município","CF, art. 39","LC 101/2000"],
+    1,"A Lei Municipal 1.656/1958 trata do regime dos servidores municipais de Curitiba."),
+  qz("leg-municipal","O controle externo das contas do Município de Curitiba é exercido:",
+    ["Apenas pelo Executivo","Pela Câmara Municipal, com auxílio do Tribunal de Contas","Exclusivamente pelo Judiciário","Pelo Ministério Público, isoladamente","Não há controle externo municipal"],
+    1,"O controle externo é do Legislativo, auxiliado pelo Tribunal de Contas."),
+
+  // Direito Constitucional
+  qz("dir-constitucional","Os princípios expressos da Administração Pública (art. 37, caput, CF) são conhecidos pela sigla:",
+    ["PICLE","LIMPE","MESCLA","FEITO","CORRETO"],
+    1,"Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência."),
+  qz("dir-constitucional","A responsabilidade civil do Estado por danos causados por seus agentes a terceiros (art. 37, §6º, CF) é do tipo:",
+    ["Subjetiva, dependente de dolo","Objetiva, independente de culpa","Inexistente","Exclusiva do agente público","Limitada a casos de dolo"],
+    1,"Responsabilidade objetiva (teoria do risco administrativo), com direito de regresso em caso de dolo/culpa."),
+  qz("dir-constitucional","Analise: I. O Brasil adota forma de Estado federativa. II. O Município possui Poder Judiciário próprio. III. A autonomia municipal inclui autogoverno e autolegislação. Está(ão) correta(s):",
+    ["Apenas I","Apenas II","Apenas I e III","Apenas II e III","I, II e III"],
+    2,"I e III corretas; II é falsa — o Município não tem Judiciário próprio."),
+
+  // Direito Administrativo
+  qz("dir-administrativo","A extinção de um ato administrativo ilegal, com efeitos retroativos, é denominada:",
+    ["Revogação","Anulação","Convalidação","Ratificação","Caducidade"],
+    1,"Anulação atinge atos ilegais, com efeito ex tunc (retroativo)."),
+  qz("dir-administrativo","O poder pelo qual a Administração limita direitos individuais em favor do interesse coletivo (ex.: fiscalização tributária) é o poder:",
+    ["Disciplinar","Hierárquico","Regulamentar","De polícia","Discricionário"],
+    3,"Definição clássica do poder de polícia administrativa."),
+  qz("dir-administrativo","Com a reforma de 2021 na Lei de Improbidade Administrativa, os atos que causam prejuízo ao erário passaram a exigir:",
+    ["Mera culpa","Dolo","Responsabilidade objetiva","Nenhum elemento subjetivo","Negligência leve"],
+    1,"Após a Lei 14.230/2021, exige-se dolo para os atos de prejuízo ao erário."),
+
+  // Raciocínio
+  qz("raciocinio","A negação da proposição 'Todos os contribuintes pagaram o tributo' é:",
+    ["Nenhum contribuinte pagou o tributo","Algum contribuinte não pagou o tributo","Todos os contribuintes não pagaram o tributo","Alguns contribuintes pagaram o tributo","Nenhuma das anteriores"],
+    1,"Negação de 'todo' é 'algum... não'."),
+  qz("raciocinio","No regime de juros compostos, os juros de cada período incidem sobre:",
+    ["Sempre o capital inicial","O montante acumulado até o período anterior","Apenas os juros do período anterior","Um valor fixo contratual","Nunca há incidência sobre juros anteriores"],
+    1,"Juros compostos incidem sobre o montante acumulado (capital + juros anteriores)."),
+  qz("raciocinio","O desvio padrão é uma medida de:",
+    ["Tendência central","Dispersão dos dados em torno da média","Moda dos dados","Frequência relativa apenas","Nenhuma das anteriores"],
+    1,"Desvio padrão mede a dispersão/variabilidade dos dados em relação à média."),
+
+  // Direito Tributário
+  qz("dir-tributario","Segundo o art. 3º do CTN, tributo é prestação pecuniária compulsória que:",
+    ["Constitui sanção de ato ilícito","Não constitui sanção de ato ilícito e é instituída em lei","Depende da vontade do contribuinte","É cobrada por atividade discricionária","Pode ser instituída por decreto"],
+    1,"A definição legal exclui sanção de ato ilícito e exige instituição por lei."),
+  qz("dir-tributario","A capacidade tributária ativa, diferentemente da competência tributária:",
+    ["É sempre indelegável","Pode ser delegada a outra pessoa jurídica de direito público","Só existe para a União","Extingue a competência do ente","É sinônimo de competência"],
+    1,"Capacidade tributária ativa (cobrar/fiscalizar/arrecadar) pode ser delegada."),
+  qz("dir-tributario","A perda do direito de a autoridade lançar o crédito tributário pelo decurso do prazo legal denomina-se:",
+    ["Prescrição","Decadência","Remissão","Anistia","Transação"],
+    1,"Decadência atinge o direito de lançar; prescrição atinge o direito de cobrar."),
+
+  // ISSQN
+  qz("issqn","As alíquotas mínima e máxima do ISSQN, fixadas pela legislação complementar federal, são respectivamente:",
+    ["1% e 4%","2% e 5%","3% e 8%","0% e 10%","5% e 10%"],
+    1,"Alíquota mínima de 2% (EC 37/2002) e máxima de 5% (LC 116/2003)."),
+  qz("issqn","Como regra geral, o ISSQN é devido no município:",
+    ["Onde reside o tomador do serviço","Do estabelecimento prestador","Onde foi firmado o contrato","Da sede da empresa cliente","Escolhido livremente pelo contribuinte"],
+    1,"Regra geral: local do estabelecimento prestador do serviço."),
+  qz("issqn","Sobre serviços de construção civil, a LC 116/2003 estabelece que o ISSQN é devido:",
+    ["Sempre no município do estabelecimento prestador","No município onde o serviço é efetivamente executado","Nunca é devido","Apenas na capital do Estado","No município de domicílio do sócio majoritário"],
+    1,"Exceção do art. 3º da LC 116/2003: local da execução do serviço."),
+
+  // Demais tributos
+  qz("demais-tributos","O fato gerador do IPTU é:",
+    ["A transmissão onerosa de bem imóvel","A propriedade, domínio útil ou posse de imóvel urbano","A prestação de serviços","A valorização imobiliária por obra pública","A circulação de mercadorias"],
+    1,"Fato gerador do IPTU conforme art. 32 do CTN."),
+  qz("demais-tributos","O ITBI incide sobre:",
+    ["Transmissão causa mortis de imóveis","Doação de imóveis","Transmissão onerosa, por ato inter vivos, de bens imóveis","Locação de imóveis","Prestação de serviços de construção civil"],
+    2,"ITBI incide sobre transmissão onerosa inter vivos; causa mortis/doação é ITCMD estadual."),
+  qz("demais-tributos","A contribuição de melhoria tem como limite total de cobrança:",
+    ["O valor venal do imóvel","O custo da obra pública","O valor arbitrado pelo contribuinte","Não há limite","5% da renda do contribuinte"],
+    1,"Limite total: custo da obra; limite individual: valorização do imóvel."),
+
+  // PAT + Reforma
+  qz("pat-reforma","A impugnação tempestiva do contribuinte, no processo administrativo tributário, tem como efeito:",
+    ["Extinguir o crédito tributário","Suspender a exigibilidade do crédito tributário","Anular automaticamente o lançamento","Não produzir qualquer efeito","Converter o crédito em dívida ativa imediatamente"],
+    1,"Art. 151, III, CTN — suspende a exigibilidade enquanto pendente de julgamento."),
+  qz("pat-reforma","A Reforma Tributária do Consumo (EC 132/2023) substitui, ao final da transição, o ICMS, o ISSQN e o PIS/Cofins principalmente pelos tributos:",
+    ["IPTU e ITBI","IBS e CBS","IOF e IPI","ITCMD e ITR","Simples Nacional e MEI"],
+    1,"IBS (compartilhado Estados/Municípios) e CBS (federal)."),
+  qz("pat-reforma","O princípio segundo o qual o novo IBS será cobrado no local de consumo do bem/serviço é o princípio:",
+    ["Da origem","Do destino","Da territorialidade estrita","Da extraterritorialidade","Da neutralidade"],
+    1,"Princípio do destino: tributação no local de consumo."),
+
+  // Contabilidade
+  qz("contabilidade","A equação fundamental da contabilidade pode ser expressa como:",
+    ["Ativo = Receita − Despesa","Ativo = Passivo + Patrimônio Líquido","Passivo = Ativo + Patrimônio Líquido","Patrimônio Líquido = Passivo − Ativo","Ativo = Passivo − Patrimônio Líquido"],
+    1,"Equação fundamental: Ativo = Passivo + PL."),
+  qz("contabilidade","Pelo método das partidas dobradas:",
+    ["Todo lançamento envolve apenas uma conta","Todo lançamento envolve, no mínimo, uma conta debitada e uma creditada, de valores iguais","Débito e crédito podem ter valores diferentes","Apenas contas de ativo são debitadas","Não há relação entre débito e crédito"],
+    1,"Princípio das partidas dobradas: débito e crédito sempre em igual valor."),
+  qz("contabilidade","No regime de competência, as receitas e despesas são reconhecidas:",
+    ["Somente quando pagas ou recebidas em dinheiro","Quando ocorrem, independentemente do recebimento/pagamento","No final do exercício, de forma consolidada","Nunca antes do pagamento","Apenas por decisão da diretoria"],
+    1,"Regime de competência reconhece o fato gerador econômico, não o fluxo financeiro."),
+
+  // Contabilidade pública / Orçamento
+  qz("contab-publica","A norma geral de direito financeiro que disciplina a elaboração e o controle dos orçamentos públicos no Brasil é a:",
+    ["Lei 8.666/93","Lei 4.320/1964","Lei 14.133/2021","CLT","Lei 6.404/76"],
+    1,"Lei 4.320/1964 é a norma geral de direito financeiro/orçamentário."),
+  qz("contab-publica","No ciclo orçamentário brasileiro, a lei que estima a receita e fixa a despesa para o exercício é a:",
+    ["PPA","LDO","LOA","LRF","NBCASP"],
+    2,"LOA (Lei Orçamentária Anual) estima receita e fixa despesa."),
+  qz("contab-publica","A Lei de Responsabilidade Fiscal (LC 101/2000) estabelece, entre outras medidas:",
+    ["Limites de gasto com pessoal e exigências de transparência fiscal","Regras exclusivas de direito penal","Normas de licitação","Regime jurídico dos servidores","Alíquotas do ISSQN"],
+    0,"LRF trata de limites de pessoal, metas fiscais e transparência."),
+
+  // Civil/Empresarial + Penal/LRF
+  qz("civil-empresarial","O regime unificado de tributação para microempresas e empresas de pequeno porte, previsto na LC 123/2006, é conhecido como:",
+    ["Lucro Real","Lucro Presumido","Simples Nacional","Regime Especial de Tributação","Regime Cumulativo"],
+    2,"Simples Nacional, instituído pela LC 123/2006."),
+  qz("penal-lrf","Os crimes contra a ordem tributária, previstos na Lei 8.137/1990, caracterizam-se, em regra, pela:",
+    ["Mera inadimplência do tributo","Fraude, omissão ou declaração falsa com intenção de suprimir/reduzir tributo","Simples atraso no pagamento","Discordância sobre interpretação da lei","Qualquer planejamento tributário lícito"],
+    1,"Exige-se fraude/dolo para a tipificação penal (Lei 8.137/1990)."),
+  qz("penal-lrf","A Lei 10.028/2000 (Lei de Crimes Fiscais) tipifica condutas que violam, principalmente, a:",
+    ["Lei de Licitações","Lei de Responsabilidade Fiscal","CLT","Lei do ISSQN","Lei de Improbidade, exclusivamente"],
+    1,"Lei 10.028/2000 tipifica crimes relacionados à LRF."),
+
+  // Economia
+  qz("economia","O indicador que mede a produção total de bens e serviços de uma economia em determinado período é o:",
+    ["IPCA","PIB","Selic","IGP-M","Índice de Gini"],
+    1,"PIB mede a produção total de bens e serviços."),
+  qz("economia","A comparação entre dados declarados pelo contribuinte e informações de terceiros, para identificar indícios de sonegação, é chamada de:",
+    ["Lançamento por homologação","Cruzamento de dados (data matching)","Decadência","Anistia fiscal","Autotutela"],
+    1,"Definição de cruzamento de dados (data matching)."),
+
+  // Governança
+  qz("governanca","A governança pública, segundo a definição usual, compreende os mecanismos de:",
+    ["Apenas execução operacional","Liderança, estratégia e controle","Apenas fiscalização tributária","Apenas planejamento financeiro","Nenhuma das anteriores"],
+    1,"Liderança, estratégia e controle são as três dimensões clássicas da governança pública."),
+  qz("governanca","O controle exercido pelo Poder Legislativo, com auxílio do Tribunal de Contas, sobre os atos do Executivo, é denominado controle:",
+    ["Interno","Externo","Judicial, exclusivamente","Social, apenas","Popular"],
+    1,"Controle externo é exercido pelo Legislativo com auxílio do TC."),
+];
+
+/* ===================== DICAS DE ESTUDO (pesquisa) ===================== */
+const DICAS = [
+  {
+    titulo:"Repetição espaçada > reler e grifar",
+    corpo:"Estudar em sessões curtas espalhadas ao longo de vários dias produz memória de longo prazo muito melhor do que concentrar tudo em uma única sessão longa (cramming). Isso é a base do sistema de Flashcards deste painel: ele reagenda automaticamente o que você já viu, com base no quanto você lembrou.",
+    fonte:"Cepeda et al. (2006), citado por lifeskillsadvocate.com — sobre prática espaçada vs. maciça; Kang (2016), citado por add.org."
+  },
+  {
+    titulo:"Recall ativo (testar-se) é mais eficaz que reler",
+    corpo:"Fechar o material e tentar lembrar o conteúdo de cabeça — respondendo uma pergunta, explicando em voz alta, ou resolvendo uma questão antes de checar a resposta — gera aprendizado muito mais forte do que reler ou grifar o texto, que estão entre os métodos menos eficazes. É por isso que este painel prioriza Flashcards e Questões, em vez de apenas te dar textos para reler.",
+    fonte:"lifeskillsadvocate.com (resumo de pesquisas sobre retrieval practice)."
+  },
+  {
+    titulo:"Blocos de foco curtos funcionam melhor que o Pomodoro clássico",
+    corpo:"Os 25 minutos tradicionais do Pomodoro costumam ser longos demais para quem tem TDAH. Blocos de 10 a 15 minutos, com pausas reais entre eles, tendem a manter o foco por mais tempo. Se o cronômetro aumentar sua ansiedade, troque tempo por tarefa: 'vou até terminar 5 questões', em vez de 'vou estudar por 15 minutos'.",
+    fonte:"add.org — 'Tips for Studying with ADHD'."
+  },
+  {
+    titulo:"Recompensas pequenas, frequentes e proporcionais",
+    corpo:"Defina recompensas pequenas após blocos de estudo (nunca usando necessidades básicas, como comer, como recompensa). A recompensa deve ser proporcional ao esforço — por exemplo, até metade do tempo estudado em atividade prazerosa. Isso ajuda a compensar a motivação mais instável associada ao TDAH.",
+    fonte:"blog.grancursosonline.com.br — 'Como lidar com o TDAH nos estudos para concurso'; Volkow et al. (2011), citado por add.org, sobre via de recompensa/dopamina."
+  },
+  {
+    titulo:"Varie a atividade dentro do bloco de estudo",
+    corpo:"Alternar entre tipos de atividade (ex.: 10 min de teoria, 10 min de flashcards, 10 min de questões) tende a renovar o ciclo natural de atenção e ajuda a manter o foco por mais tempo do que ficar na mesma tarefa repetitiva.",
+    fonte:"blog.grancursosonline.com.br."
+  },
+  {
+    titulo:"Reduza estímulos concorrentes, não elimine todo estímulo",
+    corpo:"Celular fora de alcance (não só virado para baixo), uma aba só aberta, notificações desligadas e um espaço neutro ajudam a reduzir distrações externas. Por outro lado, um pouco de estímulo controlado — como ruído branco/marrom, mastigar chiclete, ou andar enquanto lê — pode ajudar a manter o foco, em vez de prejudicá-lo.",
+    fonte:"lifeskillsadvocate.com; blog.grancursosonline.com.br."
+  },
+  {
+    titulo:"Corpo em movimento, sono e rotina também são 'técnica de estudo'",
+    corpo:"Exercício físico regular tem associação com melhora da atenção em pessoas com TDAH, e sono adequado é especialmente relevante, já que adultos com TDAH costumam ter mais dificuldade de regulação do sono. Ter um ciclo de estudos com horário fixo todos os dias reduz a ansiedade de 'quando vou começar'.",
+    fonte:"Rassovsky & Alfassi (2019) e Surman & Walsh (2021), citados por add.org."
+  },
+  {
+    titulo:"Estudar acompanhada (body doubling)",
+    corpo:"Estudar ao lado de outra pessoa — presencialmente, por chamada de vídeo, ou em salas de 'estudar comigo' — pode ajudar a manter a responsabilidade e o foco, mesmo que a outra pessoa esteja fazendo algo diferente. A pesquisa formal sobre essa técnica ainda é limitada, mas é uma estratégia amplamente relatada como útil.",
+    fonte:"add.org — nota explicitamente que a evidência formal aqui é limitada."
+  },
+];

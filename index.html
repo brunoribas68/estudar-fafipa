@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Estudos • Auditor Fiscal de Tributos Municipais (FAFIPA)</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">AF</span>
+      <div>
+        <h1>Painel de Estudos</h1>
+        <p>Auditor Fiscal de Tributos Municipais — Curitiba (FAFIPA)</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="trilha">🎮 Trilha</button>
+      <button class="tab-btn" data-tab="dashboard">📊 Painel</button>
+      <button class="tab-btn" data-tab="flashcards">🗂️ Flashcards livres</button>
+      <button class="tab-btn" data-tab="quiz">📝 Questões livres</button>
+      <button class="tab-btn" data-tab="pomodoro">⏱️ Foco livre</button>
+      <button class="tab-btn" data-tab="cronograma">📅 Cronograma</button>
+      <button class="tab-btn" data-tab="dicas">💡 Dicas (TDAH)</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- TRILHA (fluxo passo a passo) -->
+    <section class="panel active" id="panel-trilha">
+      <div id="trilha-area"></div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="panel" id="panel-dashboard">
+      <div class="grid-cards">
+        <div class="stat-card">
+          <span class="stat-label">Dias até a prova</span>
+          <span class="stat-value" id="stat-days">—</span>
+          <span class="stat-sub">Prova em 06/12/2026</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Cards para revisar hoje</span>
+          <span class="stat-value" id="stat-due">0</span>
+          <span class="stat-sub"><button class="link-btn" id="go-review">revisar agora →</button></span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Sequência de estudo</span>
+          <span class="stat-value" id="stat-streak">0 🔥</span>
+          <span class="stat-sub">dias consecutivos</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Questões resolvidas</span>
+          <span class="stat-value" id="stat-answered">0</span>
+          <span class="stat-sub" id="stat-accuracy">—% de acerto</span>
+        </div>
+      </div>
+
+      <div class="dash-row">
+        <div class="card">
+          <h3>Progresso por matéria</h3>
+          <div id="materia-progress"></div>
+        </div>
+        <div class="card">
+          <h3>Hoje no cronograma</h3>
+          <div id="today-topic"></div>
+          <p class="muted">Lembrete: domingos são só revisão — sem conteúdo novo.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Como usar este painel (feito pensando em TDAH)</h3>
+        <ul class="tips-mini">
+          <li>Comece sempre pelo <strong>Foco</strong> (timer) — blocos curtos de 10–15 min, não os 25 min "padrão".</li>
+          <li>Depois do bloco, faça <strong>Flashcards</strong> — a repetição espaçada já escolhe o que revisar por você.</li>
+          <li>Feche o dia com um <strong>Quiz</strong> curto (5 questões) da matéria do dia — é recall ativo, o método mais eficaz.</li>
+          <li>Não precisa fazer tudo de uma vez. Metade do painel hoje já é vitória.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section class="panel" id="panel-flashcards">
+      <div class="panel-header">
+        <h2>Flashcards (repetição espaçada)</h2>
+        <select id="deck-filter"></select>
+      </div>
+      <div id="flashcard-area" class="flash-area">
+        <p class="muted" id="no-cards-msg">Nenhum card para revisar agora nesse filtro. Escolha "Todos os cards" para praticar livremente.</p>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="panel" id="panel-quiz">
+      <div class="panel-header">
+        <h2>Banco de questões (estilo FAFIPA)</h2>
+        <select id="quiz-filter"></select>
+      </div>
+      <div id="quiz-area"></div>
+    </section>
+
+    <!-- POMODORO -->
+    <section class="panel" id="panel-pomodoro">
+      <div class="pomodoro-wrap">
+        <div class="timer-card">
+          <div class="timer-display" id="timer-display">10:00</div>
+          <div class="timer-label" id="timer-label">Pronta para focar?</div>
+          <div class="timer-controls">
+            <button id="timer-start" class="btn-primary">Iniciar</button>
+            <button id="timer-pause" class="btn-secondary" disabled>Pausar</button>
+            <button id="timer-reset" class="btn-ghost">Reiniciar</button>
+          </div>
+          <div class="timer-settings">
+            <label>Foco: <input type="number" id="work-min" value="12" min="5" max="25" /> min</label>
+            <label>Pausa: <input type="number" id="break-min" value="5" min="3" max="15" /> min</label>
+          </div>
+          <div class="timer-task">
+            <input type="text" id="task-input" placeholder='O que você vai fazer neste bloco? Ex.: "10 flashcards de ISSQN"' />
+          </div>
+          <div class="timer-cycles">🍅 Blocos completos hoje: <strong id="cycles-today">0</strong></div>
+        </div>
+        <div class="card pomodoro-tip">
+          <h3>Por que blocos curtos?</h3>
+          <p>Pesquisas sobre TDAH e aprendizagem mostram que os 25 minutos "clássicos" do Pomodoro costumam ser longos demais. Blocos de 10–15 minutos com pausas reais funcionam melhor para manter o foco. Se o cronômetro aumentar sua ansiedade, troque por uma meta por tarefa (ex.: "até terminar 5 questões") em vez de tempo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRONOGRAMA -->
+    <section class="panel" id="panel-cronograma">
+      <h2>Cronograma (12/11 – 04/12)</h2>
+      <div id="cronograma-list" class="cronograma-list"></div>
+    </section>
+
+    <!-- DICAS -->
+    <section class="panel" id="panel-dicas">
+      <h2>O que a ciência diz sobre estudar com TDAH</h2>
+      <p class="muted">Resumo de pesquisas e artigos sobre técnicas de estudo e memória, com foco em TDAH. Fontes ao final de cada bloco.</p>
+      <div id="dicas-content" class="dicas-content"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="theory.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
