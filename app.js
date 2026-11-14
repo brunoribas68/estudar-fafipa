@@ -67,7 +67,7 @@ function toggleTheoryAudio(materia, html, btn){
     return;
   }
   btn.textContent = "⏳ Carregando áudio...";
-  const audio = new Audio(`audio/teoria-${materia}.mp3`);
+  const audio = new Audio(`audio/teoria-${materia}.wav`);
   theoryAudioEl = audio;
   audio.addEventListener("playing", ()=>{ btn.textContent = "⏸️ Parar leitura"; });
   audio.addEventListener("ended", ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; theoryAudioEl = null; });

@@ -1,15 +1,19 @@
 #!/usr/bin/env node
-/* ===================== GERADOR DE ÁUDIO (Google Cloud Text-to-Speech) =====================
-   Gera, uma única vez, um .mp3 por matéria com a teoria lida em voz natural (voz Neural2
-   do Google), salvando em /audio. O app usa esses arquivos prontos — não chama a API
-   toda vez que alguém clica em "Ouvir", então não gera custo repetido.
+/* ===================== GERADOR DE ÁUDIO (TTS nativo do Gemini) =====================
+   Gera, uma única vez, um .wav por matéria com a teoria lida em voz natural, salvando em
+   /audio. O app usa esses arquivos prontos — não chama a API toda vez que alguém clica em
+   "Ouvir", então não gera custo repetido.
+
+   Usa a Generative Language API do Gemini (generativelanguage.googleapis.com), não a Cloud
+   Text-to-Speech clássica — porque chaves geradas no Google AI Studio (o tipo mais comum
+   pra quem usa Gemini/NotebookLM) só funcionam com essa API. Se você tiver uma chave de
+   verdade do Google Cloud com a "Cloud Text-to-Speech API" ativada e faturamento vinculado,
+   me avise que eu troco o script pra usar aquela (custa menos por caractere).
 
    Como usar:
-     1. Confirme que existe um arquivo .env na raiz do projeto com:
-          GOOGLE_API_KEY=sua_chave_aqui
-          GOOGLE_TTS_VOICE=pt-BR-Neural2-A   (opcional, essa já é o padrão)
+     1. Copie .env.example para .env e cole sua chave em GOOGLE_API_KEY.
      2. Rode:  node tools/generate-audio.js
-     3. Os arquivos aparecem em /audio/teoria-<materia>.mp3
+     3. Os arquivos aparecem em /audio/teoria-<materia>.wav
 
    Pode rodar de novo sem medo: matérias que já têm áudio gerado são puladas
    (apague o arquivo correspondente em /audio se quiser regenerar uma matéria específica).
@@ -28,7 +32,7 @@ function loadEnv(){
   const envPath = path.join(ROOT, ".env");
   if(!fs.existsSync(envPath)){
     console.error("Não encontrei o arquivo .env na raiz do projeto.");
-    console.error('Crie um arquivo .env com a linha: GOOGLE_API_KEY=sua_chave');
+    console.error("Copie .env.example para .env e cole sua chave em GOOGLE_API_KEY.");
     process.exit(1);
   }
   const env = {};
@@ -63,15 +67,14 @@ function htmlToPlainText(html){
     .trim();
 }
 
-// A API aceita até 5000 bytes de texto por chamada — quebramos por frase,
-// respeitando esse limite, e depois juntamos os pedaços de áudio num só arquivo.
-function chunkText(text, maxBytes){
+// Quebra o texto em pedaços menores (por frase) pra manter cada chamada rápida e segura.
+function chunkText(text, maxChars){
   const sentences = text.split(/(?<=[.!?])\s+/);
   const chunks = [];
   let cur = "";
   for(const s of sentences){
     const candidate = cur ? cur + " " + s : s;
-    if(Buffer.byteLength(candidate, "utf8") > maxBytes){
+    if(candidate.length > maxChars){
       if(cur) chunks.push(cur);
       cur = s;
     } else {
@@ -82,18 +85,25 @@ function chunkText(text, maxBytes){
   return chunks;
 }
 
-function synthesize(apiKey, text, voiceName){
+// Chama o Gemini pra gerar áudio (saída é PCM 16-bit bruto, sem cabeçalho).
+function synthesizeGemini(apiKey, text, voiceName, model){
   return new Promise((resolve, reject)=>{
     const body = JSON.stringify({
-      input: { text },
-      voice: { languageCode: "pt-BR", name: voiceName },
-      audioConfig: { audioEncoding: "MP3", speakingRate: 0.98 }
+      contents: [{ parts: [{ text }] }],
+      generationConfig: {
+        responseModalities: ["AUDIO"],
+        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } }
+      }
     });
     const options = {
-      hostname: "texttospeech.googleapis.com",
-      path: "/v1/text:synthesize?key=" + apiKey,
+      hostname: "generativelanguage.googleapis.com",
+      path: `/v1beta/models/${model}:generateContent`,
       method: "POST",
-      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+        "Content-Length": Buffer.byteLength(body)
+      }
     };
     const req = https.request(options, res=>{
       let data = "";
@@ -104,14 +114,43 @@ function synthesize(apiKey, text, voiceName){
           return;
         }
         try{
-          resolve(Buffer.from(JSON.parse(data).audioContent, "base64"));
-        }catch(e){ reject(e); }
+          const json = JSON.parse(data);
+          const part = json.candidates[0].content.parts[0];
+          const pcm = Buffer.from(part.inlineData.data, "base64");
+          const mime = part.inlineData.mimeType || "audio/L16;rate=24000";
+          const rateMatch = mime.match(/rate=(\d+)/);
+          const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+          resolve({ pcm, sampleRate });
+        }catch(e){
+          reject(new Error("Resposta inesperada da API: " + e.message + " — " + data.slice(0, 400)));
+        }
       });
     });
     req.on("error", reject);
     req.write(body);
     req.end();
   });
+}
+
+// O Gemini devolve PCM cru (sem cabeçalho) — embrulha num .wav pra ficar tocável.
+function pcmToWav(pcmBuffer, sampleRate, numChannels, bitDepth){
+  const byteRate = sampleRate * numChannels * bitDepth / 8;
+  const blockAlign = numChannels * bitDepth / 8;
+  const header = Buffer.alloc(44);
+  header.write("RIFF", 0);
+  header.writeUInt32LE(36 + pcmBuffer.length, 4);
+  header.write("WAVE", 8);
+  header.write("fmt ", 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM
+  header.writeUInt16LE(numChannels, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(byteRate, 28);
+  header.writeUInt16LE(blockAlign, 32);
+  header.writeUInt16LE(bitDepth, 34);
+  header.write("data", 36);
+  header.writeUInt32LE(pcmBuffer.length, 40);
+  return Buffer.concat([header, pcmBuffer]);
 }
 
 async function main(){
@@ -121,33 +160,41 @@ async function main(){
     console.error("GOOGLE_API_KEY não está definida no .env");
     process.exit(1);
   }
-  const voice = env.GOOGLE_TTS_VOICE || "pt-BR-Neural2-A";
+  const voice = env.GOOGLE_TTS_VOICE || "Kore";
+  const model = env.GOOGLE_TTS_MODEL || "gemini-2.5-flash-preview-tts";
 
   const TEORIA = loadTeoria();
   const outDir = path.join(ROOT, "audio");
   if(!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
   const materias = Object.keys(TEORIA);
-  console.log(`Gerando áudio para ${materias.length} matérias, voz ${voice}...\n`);
+  console.log(`Gerando áudio para ${materias.length} matérias — modelo ${model}, voz ${voice}...\n`);
 
   for(const materia of materias){
-    const outFile = path.join(outDir, `teoria-${materia}.mp3`);
+    const outFile = path.join(outDir, `teoria-${materia}.wav`);
     if(fs.existsSync(outFile)){
       console.log(`⏭  ${materia} — já existe, pulando`);
       continue;
     }
     try{
       const text = htmlToPlainText(TEORIA[materia]);
-      const chunks = chunkText(text, 4800);
+      const chunks = chunkText(text, 1800);
       console.log(`🎙  ${materia} (${text.length} caracteres, ${chunks.length} parte(s))...`);
-      const buffers = [];
+      let sampleRate = 24000;
+      const pcmParts = [];
       for(const chunk of chunks){
-        buffers.push(await synthesize(apiKey, chunk, voice));
+        const r = await synthesizeGemini(apiKey, chunk, voice, model);
+        sampleRate = r.sampleRate;
+        pcmParts.push(r.pcm);
       }
-      fs.writeFileSync(outFile, Buffer.concat(buffers));
+      const wav = pcmToWav(Buffer.concat(pcmParts), sampleRate, 1, 16);
+      fs.writeFileSync(outFile, wav);
       console.log(`   ✅ ${path.relative(ROOT, outFile)}`);
     }catch(err){
       console.error(`   ❌ erro em ${materia}: ${err.message}`);
+      if(/CREDENTIALS_MISSING|UNAUTHENTICATED|API key not valid|PERMISSION_DENIED/i.test(err.message)){
+        console.error("   → Verifique se GOOGLE_API_KEY no .env é uma chave válida do Google AI Studio (ai.google.dev) com a API Gemini habilitada.");
+      }
     }
   }
   console.log("\nPronto. Os áudios ficam em /audio e o app já sabe usá-los automaticamente.");
