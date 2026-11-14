@@ -167,8 +167,21 @@ async function main(){
   const outDir = path.join(ROOT, "audio", "gemini");
   if(!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-  const materias = Object.keys(TEORIA);
-  console.log(`Gerando áudio para ${materias.length} matérias — modelo ${model}, voz ${voice}...\n`);
+  // O texto mais longo de teoria hoje tem ~3100 caracteres — usando um limite de 4000
+  // por pedaço, cada matéria cabe numa chamada só. Importa porque a conta gratuita do
+  // Gemini tem cota bem curta por dia (10 chamadas/dia nesse modelo); cada chamada
+  // economizada é uma matéria a mais que dá pra gerar no mesmo dia.
+  const allMaterias = Object.keys(TEORIA);
+  const filtro = process.argv.slice(2);
+  const materias = filtro.length ? allMaterias.filter(m=>filtro.includes(m)) : allMaterias;
+
+  const pendentes = materias.filter(m=>!fs.existsSync(path.join(outDir, `teoria-${m}.wav`)));
+  const prontas = materias.length - pendentes.length;
+  console.log(`Matérias: ${materias.length} selecionadas (${prontas} já prontas, ${pendentes.length} pendentes).`);
+  console.log(`Modelo ${model}, voz ${voice}.`);
+  if(filtro.length) console.log(`Filtro aplicado: ${filtro.join(", ")}`);
+  console.log(`Dica: pra gerar só algumas matérias (rendendo a cota entre vários dias), rode:`);
+  console.log(`  node tools/generate-audio.js ${allMaterias.slice(0,3).join(" ")}\n`);
 
   for(const materia of materias){
     const outFile = path.join(outDir, `teoria-${materia}.wav`);
@@ -178,7 +191,7 @@ async function main(){
     }
     try{
       const text = htmlToPlainText(TEORIA[materia]);
-      const chunks = chunkText(text, 1800);
+      const chunks = chunkText(text, 4000);
       console.log(`🎙  ${materia} (${text.length} caracteres, ${chunks.length} parte(s))...`);
       let sampleRate = 24000;
       const pcmParts = [];
@@ -195,9 +208,15 @@ async function main(){
       if(/CREDENTIALS_MISSING|UNAUTHENTICATED|API key not valid|PERMISSION_DENIED/i.test(err.message)){
         console.error("   → Verifique se GOOGLE_API_KEY no .env é uma chave válida do Google AI Studio (ai.google.dev) com a API Gemini habilitada.");
       }
+      if(/RESOURCE_EXHAUSTED|429|quota/i.test(err.message)){
+        console.error("\n⚠️  Cota diária do Gemini esgotada. Parando aqui pra não desperdiçar tentativas —");
+        console.error("    o que já foi gerado está salvo; rode o script de novo quando a cota renovar");
+        console.error("    (o erro costuma trazer o tempo de espera em \"retryDelay\").");
+        break;
+      }
     }
   }
-  console.log("\nPronto. Os áudios ficam em /audio e o app já sabe usá-los automaticamente.");
+  console.log("\nPronto por agora. Os áudios gerados ficam em /audio/gemini e o app já sabe usá-los automaticamente.");
 }
 
 main();
