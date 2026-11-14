@@ -70,7 +70,8 @@ function formatTime(s){
   const m = Math.floor(s / 60), sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
-function buildAudioPlayer(materia, html){
+function buildAudioPlayer(materiaIds, html){
+  const ids = Array.isArray(materiaIds) ? materiaIds : [materiaIds];
   const wrap = document.createElement("div");
   wrap.className = "audio-player";
   wrap.innerHTML = `
@@ -114,14 +115,18 @@ function buildAudioPlayer(materia, html){
     window.speechSynthesis.speak(utter);
   }
 
+  // tenta cada id de matéria (parte específica primeiro, matéria inteira depois)
+  // em cada provedor de áudio, nessa ordem, antes de desistir e cair pra voz do navegador.
+  const attempts = [];
+  for(const id of ids){ for(const p of AUDIO_PROVIDERS){ attempts.push({ id, ...p }); } }
   function tryAudioProvider(idx){
-    if(idx >= AUDIO_PROVIDERS.length){
+    if(idx >= attempts.length){
       mode = "tts";
       speakWithControls();
       return;
     }
-    const { name, ext } = AUDIO_PROVIDERS[idx];
-    const a = new Audio(`audio/${name}/teoria-${materia}.${ext}`);
+    const { id, name, ext } = attempts[idx];
+    const a = new Audio(`audio/${name}/teoria-${id}.${ext}`);
     a.playbackRate = SPEED_STEPS[speedIdx];
     a.addEventListener("loadedmetadata", ()=>{ timeEl.textContent = formatTime(a.duration); });
     a.addEventListener("timeupdate", ()=>{
@@ -359,7 +364,17 @@ function goToNextStep(entry){
 }
 
 function renderStepTeoria(content, entry){
-  const txt = TEORIA[entry.materia] || "<p>Sem material de teoria cadastrado para este dia — siga para a prática.</p>";
+  // matérias com mais de um dia de conteúdo novo (ex.: Português tem 3, Direito
+  // Tributário tem 2) guardam a teoria como um array — uma posição por dia/parte —
+  // em vez de um texto único repetido em todos os dias daquela matéria.
+  const raw = TEORIA[entry.materia];
+  const txt = Array.isArray(raw)
+    ? (raw[(entry.parte||1) - 1] || raw[raw.length-1])
+    : (raw || "<p>Sem material de teoria cadastrado para este dia — siga para a prática.</p>");
+  // id do áudio inclui a parte (ex.: "dir-tributario-parte2") pra não tocar o
+  // áudio de outro trecho da matéria; se esse arquivo específico ainda não foi
+  // gerado, cai pro áudio da matéria inteira e, por fim, pra voz do navegador.
+  const audioId = Array.isArray(raw) && entry.parte ? `${entry.materia}-parte${entry.parte}` : entry.materia;
   const img = IMAGENS[entry.materia];
   content.innerHTML = `
     ${img ? `<div class="theory-image"><img src="images/${img}" alt="Diagrama de apoio — ${MATERIA_LABEL[entry.materia]||''}" /></div>` : ""}
@@ -376,7 +391,8 @@ function renderStepTeoria(content, entry){
       <button class="btn-primary" id="step-next">Já li, continuar →</button>
     </div>`;
   initMiniTimer();
-  document.getElementById("theory-player-slot").appendChild(buildAudioPlayer(entry.materia, txt));
+  const audioIds = audioId===entry.materia ? [entry.materia] : [audioId, entry.materia];
+  document.getElementById("theory-player-slot").appendChild(buildAudioPlayer(audioIds, txt));
   document.getElementById("step-next").addEventListener("click", ()=>{ stopTheoryAudio(); goToNextStep(entry); });
 }
 

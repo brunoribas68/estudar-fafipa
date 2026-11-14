@@ -1,24 +1,30 @@
 /* Conteúdo de teoria por matéria — isto é o que você LÊ no passo 1 da trilha. */
 const TEORIA = {
 
-portugues: `
+portugues: [
+`
 <h4>Interpretação de texto e coesão/coerência</h4>
 <p><strong>Coesão</strong> é a ligação gramatical entre as partes do texto: uso de pronomes, conectivos, sinônimos e repetição controlada para encadear as frases. <strong>Coerência</strong> é diferente — é o sentido lógico global, a compreensão unificada do texto como um todo. Um texto pode ter coesão perfeita e ainda não fazer sentido (incoerente), ou ser coerente com coesão mais frouxa.</p>
 <p>Em prova, questões de interpretação cobram: a ideia central do texto, a função de um conectivo específico ("mas" = oposição, "pois" = causa/conclusão, "embora" = concessão), e o que uma palavra retoma (referência anafórica).</p>
 <h4>Variação linguística e gêneros/tipologia textual</h4>
 <p>Variação linguística é a forma como a língua muda conforme região, classe social, grau de formalidade e contexto — não existe "errado", existe adequado ou inadequado ao contexto.</p>
 <p><strong>Gênero textual</strong> é a forma social que o texto assume (notícia, bilhete, e-mail, lei, edital). <strong>Tipologia textual</strong> é a estrutura interna: narrativo, descritivo, dissertativo-argumentativo, expositivo, injuntivo (instrucional).</p>
+<div class="atencao"><strong>Pegadinha comum:</strong> banca troca o conectivo por outro de sentido parecido mas função diferente ("mas" vira "e", mudando a relação de oposição para adição) e pede para você notar a diferença de sentido causada pela troca.</div>
+`,
+`
 <h4>Ortografia, classes de palavras e semântica</h4>
 <p>Pontos mais cobrados: uso de <mark class="hl">"porquê"/"por que"/"por quê"/"porque"</mark>; <mark class="hl">"mal" x "mau"</mark>; <mark class="hl">"mas" x "mais"</mark>. Classes de palavras: substantivo, adjetivo, verbo, advérbio, pronome, preposição, conjunção. Semântica cobra sinônimos, antônimos, denotação x conotação, polissemia (palavra com vários sentidos conforme o contexto).</p>
-<h4>Funções sintáticas, concordância e pontuação</h4>
-<p>Funções sintáticas principais: sujeito, predicado, objeto direto/indireto, predicativo do sujeito, complemento nominal, adjunto adnominal/adverbial. Concordância verbal: sujeito composto anteposto ao verbo geralmente leva o verbo ao plural. Concordância nominal: adjetivo concorda em gênero e número com o substantivo. Pontuação: vírgula não separa sujeito de predicado nem verbo de complemento sem motivo (erro clássico de prova).</p>
-<h4>Literatura brasileira (noções gerais)</h4>
-<p>Movimentos cobrados em concursos de nível médio/superior normalmente envolvem reconhecimento geral de períodos: Barroco, Arcadismo, Romantismo, Realismo/Naturalismo, Parnasianismo, Simbolismo, Modernismo (1ª, 2ª e 3ª gerações) — geralmente em nível superficial, associando autor a estilo/época.</p>
-<div class="atencao"><strong>Pegadinha comum:</strong> banca troca o conectivo por outro de sentido parecido mas função diferente ("mas" vira "e", mudando a relação de oposição para adição) e pede para você notar a diferença de sentido causada pela troca.</div>
 <h4>Aprofundando: regência e crase</h4>
 <p>Regência verbal: "assistir" (ver) pede preposição "a" ("assisti ao filme"); "assistir" (ajudar/morar) não pede. <mark class="hl">"Chegar/ir" pedem preposição "a", não "em"</mark> ("cheguei a Curitiba", nunca "cheguei em Curitiba" na norma culta cobrada em prova). Crase: ocorre na fusão da preposição "a" com o artigo feminino "a(s)" — regra prática: troque a palavra feminina por uma masculina equivalente; se aparecer "ao", há crase ("Fui à prefeitura" / "Fui ao órgão" → crase confirmada).</p>
 <div class="exemplo"><strong>Exemplo de prova:</strong> "O auditor se referia àquela norma revogada" — crase antes de "aquela" é obrigatória por ser pronome demonstrativo feminino regido por preposição "a".</div>
 `,
+`
+<h4>Funções sintáticas, concordância e pontuação</h4>
+<p>Funções sintáticas principais: sujeito, predicado, objeto direto/indireto, predicativo do sujeito, complemento nominal, adjunto adnominal/adverbial. Concordância verbal: sujeito composto anteposto ao verbo geralmente leva o verbo ao plural. Concordância nominal: adjetivo concorda em gênero e número com o substantivo. Pontuação: vírgula não separa sujeito de predicado nem verbo de complemento sem motivo (erro clássico de prova).</p>
+<h4>Literatura brasileira (noções gerais)</h4>
+<p>Movimentos cobrados em concursos de nível médio/superior normalmente envolvem reconhecimento geral de períodos: Barroco, Arcadismo, Romantismo, Realismo/Naturalismo, Parnasianismo, Simbolismo, Modernismo (1ª, 2ª e 3ª gerações) — geralmente em nível superficial, associando autor a estilo/época.</p>
+`
+],
 
 informatica: `
 <h4>Hardware e software</h4>
@@ -53,27 +59,34 @@ informatica: `
 <p>A Lei Orgânica está para o Município assim como a Constituição Federal está para a União — é a norma de maior hierarquia local, e todas as demais leis municipais (incluindo o Código Tributário) devem respeitá-la e respeitar a Constituição Federal e Estadual. Decretos do Executivo municipal regulamentam a aplicação das leis, mas não podem inovar além do que a lei permite (princípio da legalidade).</p>
 `,
 
-"dir-constitucional": `
+"dir-constitucional": [
+`
 <h4>Princípios fundamentais e direitos (arts. 1º a 5º da CF)</h4>
 <p>Princípios fundamentais: forma federativa, soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e livre iniciativa, pluralismo político. Direitos e garantias fundamentais (art. 5º): igualdade, legalidade, devido processo legal, presunção de inocência, remédios constitucionais (habeas corpus, mandado de segurança, habeas data).</p>
 <h4>Organização político-administrativa e dos Poderes</h4>
 <p>União, Estados, DF e Municípios, todos autônomos (art. 18). Forma de Estado federativa; forma de governo republicana; sistema presidencialista. Poderes Legislativo, Executivo e Judiciário são independentes e harmônicos entre si (freios e contrapesos). Autonomia municipal (<mark class="hl-prazo">arts. 29-31</mark>): auto-organização, autogoverno, autolegislação e autoadministração. O Município <strong>não</strong> tem Judiciário próprio.</p>
+<h4>Aprofundando: remédios constitucionais</h4>
+<p><strong>Habeas corpus:</strong> protege a liberdade de locomoção (ir e vir) ameaçada ou violada por ilegalidade/abuso de poder. <strong>Mandado de segurança:</strong> protege direito líquido e certo não amparado por HC/HD, contra ato de autoridade pública. <strong>Habeas data:</strong> garante acesso ou retificação de informações sobre a própria pessoa em bancos de dados públicos. <strong>Ação popular:</strong> qualquer cidadão pode propor para anular ato lesivo ao patrimônio público, à moralidade administrativa, ao meio ambiente ou ao patrimônio histórico/cultural.</p>
+`,
+`
 <h4>Administração Pública (arts. 37-41)</h4>
 <p>Princípios expressos: LIMPE (Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência). Concurso público é a regra para investidura em cargo efetivo. Acumulação de cargos é proibida, salvo exceções expressas (ex.: dois cargos de professor), respeitada a compatibilidade de horários. Estabilidade exige <mark class="hl-prazo">3 anos</mark> de efetivo exercício com avaliação de desempenho. Responsabilidade civil do Estado é objetiva (independe de culpa), com direito de regresso contra o agente em caso de dolo/culpa.</p>
 <h4>Tribunais de Contas</h4>
 <p>Órgãos auxiliares do Legislativo no controle externo. No âmbito municipal, o controle externo é exercido pela Câmara, com auxílio do Tribunal de Contas do Estado.</p>
 <div class="atencao"><strong>Pegadinha comum:</strong> achar que o Tribunal de Contas julga as contas do Prefeito — na verdade, ele apenas emite PARECER PRÉVIO sobre as contas de governo do Chefe do Executivo; quem julga é a Câmara Municipal. Já as contas de gestão de outros administradores/ordenadores de despesa são julgadas pelo próprio Tribunal de Contas.</div>
-<h4>Aprofundando: remédios constitucionais</h4>
-<p><strong>Habeas corpus:</strong> protege a liberdade de locomoção (ir e vir) ameaçada ou violada por ilegalidade/abuso de poder. <strong>Mandado de segurança:</strong> protege direito líquido e certo não amparado por HC/HD, contra ato de autoridade pública. <strong>Habeas data:</strong> garante acesso ou retificação de informações sobre a própria pessoa em bancos de dados públicos. <strong>Ação popular:</strong> qualquer cidadão pode propor para anular ato lesivo ao patrimônio público, à moralidade administrativa, ao meio ambiente ou ao patrimônio histórico/cultural.</p>
-`,
+`
+],
 
-"dir-administrativo": `
+"dir-administrativo": [
+`
 <h4>Regime jurídico-administrativo e princípios</h4>
 <p>Combinação de prerrogativas (poderes especiais da Administração) e sujeições (limites e deveres) — supremacia do interesse público + indisponibilidade do interesse público. Princípios implícitos: autotutela (a Administração revisa seus próprios atos), continuidade do serviço público, razoabilidade/proporcionalidade, motivação.</p>
 <h4>Atos administrativos</h4>
 <p>Atributos: presunção de legitimidade, imperatividade, autoexecutoriedade, tipicidade. Elementos: sujeito, objeto, forma, motivo, finalidade. Atos <strong>vinculados</strong> (lei não deixa margem de escolha) x <strong>discricionários</strong> (margem de escolha quanto a oportunidade/conveniência, dentro de limites legais).</p>
 <h4>Invalidação dos atos</h4>
 <p><strong>Anulação</strong>: retira ato ilegal, efeito retroativo (ex tunc); pode ser feita pela Administração ou pelo Judiciário. <strong>Revogação</strong>: extingue ato legal mas inconveniente, efeito ex nunc; só a Administração revoga (Judiciário não revoga, só anula). <strong>Convalidação</strong>: corrige defeito sanável, com efeito retroativo.</p>
+`,
+`
 <h4>Poderes administrativos</h4>
 <p>Discricionário, regulamentar (decretos), hierárquico, disciplinar, e de <strong>polícia</strong> (limita direitos individuais em favor do interesse coletivo — fiscalização sanitária, de trânsito, tributária).</p>
 <h4>Organização administrativa, servidores e licitações</h4>
@@ -81,7 +94,8 @@ informatica: `
 <div class="atencao"><strong>Pegadinha comum:</strong> inexigibilidade e dispensa de licitação não são sinônimos. Dispensa: a licitação é viável, mas a lei dispensa (ex.: valores pequenos, emergência). Inexigibilidade: a licitação é <em>inviável</em> porque não há competição possível (ex.: fornecedor exclusivo, notória especialização).</div>
 <h4>Aprofundando: controle da Administração</h4>
 <p>Controle quanto à origem: <strong>interno</strong> (a própria Administração se controla, via controladoria/auditoria) e <strong>externo</strong> (Legislativo, com auxílio do Tribunal de Contas). Quanto ao momento: <strong>prévio</strong> (antes do ato), <strong>concomitante</strong> (durante) e <strong>posterior</strong> (depois de praticado). Quanto ao aspecto: controle de <strong>legalidade</strong> (conformidade com a lei) e controle de <strong>mérito</strong> (conveniência/oportunidade, só cabível à própria Administração, nunca ao Judiciário).</p>
-`,
+`
+],
 
 raciocinio: `
 <h4>Lógica proposicional</h4>
@@ -96,11 +110,14 @@ raciocinio: `
 <div class="exemplo"><strong>Exemplo de prova:</strong> um IPTU de R$ 1.000 em atraso há 3 meses, com juros de mora de 1% ao mês (juros simples): J = 1000 × 0,01 × 3 = R$ 30 de juros, totalizando R$ 1.030.</div>
 `,
 
-"dir-tributario": `
+"dir-tributario": [
+`
 <h4>Conceito, espécies e competência</h4>
 <p>Tributo (art. 3º CTN): prestação pecuniária compulsória, que não constitui sanção de ato ilícito, instituída em lei, cobrada por atividade vinculada. Espécies: impostos (não vinculados), taxas (vinculadas a serviço específico/divisível ou poder de polícia), contribuição de melhoria (por valorização imobiliária). Competência tributária é indelegável, mas seu exercício é facultativo; já a <strong>capacidade tributária ativa</strong> (cobrar/fiscalizar/arrecadar) pode ser delegada a outra pessoa jurídica de direito público.</p>
 <h4>Princípios tributários constitucionais</h4>
 <p>Legalidade, anterioridade anual (não cobrar no mesmo exercício da lei), anterioridade nonagesimal (<mark class="hl-prazo">90 dias</mark>), irretroatividade, isonomia, vedação ao confisco.</p>
+`,
+`
 <h4>Obrigação, sujeitos e responsabilidade</h4>
 <p>Obrigação principal (pagar tributo/multa) x acessória (deveres como emitir nota fiscal). Sujeito ativo (cobra) x passivo: contribuinte (relação direta com o fato gerador) ou responsável (por lei, sem ser o contribuinte direto). Responsabilidade por substituição, transferência, solidariedade e dos sucessores.</p>
 <h4>Crédito tributário: lançamento, suspensão, extinção, exclusão</h4>
@@ -108,7 +125,8 @@ raciocinio: `
 <div class="atencao"><strong>Pegadinha comum:</strong> isenção não é o mesmo que imunidade. Imunidade é limitação constitucional ao poder de tributar (a Constituição impede que o tributo sequer exista para aquele caso). Isenção é dispensa legal do pagamento de um tributo que, sem a lei isentiva, seria devido — é infraconstitucional, concedida por lei ordinária/específica.</div>
 <h4>Aprofundando: imunidades tributárias (art. 150, VI, CF)</h4>
 <p>São imunes a impostos: entes federativos entre si (imunidade recíproca), templos de qualquer culto, patrimônio/renda/serviços de partidos políticos, entidades sindicais de trabalhadores, instituições de educação e assistência social sem fins lucrativos (que atendam requisitos legais), livros, jornais, periódicos e o papel destinado à sua impressão. Atenção: a imunidade recíproca e as demais do art. 150, VI, aplicam-se apenas a <strong>impostos</strong> — não afastam taxas nem contribuições de melhoria.</p>
-`,
+`
+],
 
 issqn: `
 <h4>Base normativa e alíquotas</h4>

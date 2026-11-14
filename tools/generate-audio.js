@@ -167,32 +167,45 @@ async function main(){
   const outDir = path.join(ROOT, "audio", "gemini");
   if(!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-  // O texto mais longo de teoria hoje tem ~3100 caracteres — usando um limite de 4000
-  // por pedaço, cada matéria cabe numa chamada só. Importa porque a conta gratuita do
-  // Gemini tem cota bem curta por dia (10 chamadas/dia nesse modelo); cada chamada
-  // economizada é uma matéria a mais que dá pra gerar no mesmo dia.
+  // Matérias com mais de um dia de conteúdo novo (ex.: Português tem 3 partes, Direito
+  // Tributário tem 2) guardam a teoria como array em vez de texto único — uma entrada de
+  // áudio por parte (teoria-<materia>-parteN.wav), pra não ler o texto errado no dia errado.
   const allMaterias = Object.keys(TEORIA);
-  const filtro = process.argv.slice(2);
-  const materias = filtro.length ? allMaterias.filter(m=>filtro.includes(m)) : allMaterias;
+  const jobs = [];
+  for(const materia of allMaterias){
+    const val = TEORIA[materia];
+    if(Array.isArray(val)){
+      val.forEach((texto, i)=> jobs.push({ materia, id: `${materia}-parte${i+1}`, texto }));
+    } else {
+      jobs.push({ materia, id: materia, texto: val });
+    }
+  }
 
-  const pendentes = materias.filter(m=>!fs.existsSync(path.join(outDir, `teoria-${m}.wav`)));
-  const prontas = materias.length - pendentes.length;
-  console.log(`Matérias: ${materias.length} selecionadas (${prontas} já prontas, ${pendentes.length} pendentes).`);
+  // O texto mais longo de teoria hoje tem ~3100 caracteres — usando um limite de 4000
+  // por pedaço, cada parte cabe numa chamada só. Importa porque a conta gratuita do
+  // Gemini tem cota bem curta por dia (10 chamadas/dia nesse modelo); cada chamada
+  // economizada é uma parte a mais que dá pra gerar no mesmo dia.
+  const filtro = process.argv.slice(2);
+  const selected = filtro.length ? jobs.filter(j=>filtro.includes(j.materia)) : jobs;
+
+  const pendentes = selected.filter(j=>!fs.existsSync(path.join(outDir, `teoria-${j.id}.wav`)));
+  const prontas = selected.length - pendentes.length;
+  console.log(`Partes de teoria: ${selected.length} selecionadas (${prontas} já prontas, ${pendentes.length} pendentes).`);
   console.log(`Modelo ${model}, voz ${voice}.`);
   if(filtro.length) console.log(`Filtro aplicado: ${filtro.join(", ")}`);
   console.log(`Dica: pra gerar só algumas matérias (rendendo a cota entre vários dias), rode:`);
   console.log(`  node tools/generate-audio.js ${allMaterias.slice(0,3).join(" ")}\n`);
 
-  for(const materia of materias){
-    const outFile = path.join(outDir, `teoria-${materia}.wav`);
+  for(const job of selected){
+    const outFile = path.join(outDir, `teoria-${job.id}.wav`);
     if(fs.existsSync(outFile)){
-      console.log(`⏭  ${materia} — já existe, pulando`);
+      console.log(`⏭  ${job.id} — já existe, pulando`);
       continue;
     }
     try{
-      const text = htmlToPlainText(TEORIA[materia]);
+      const text = htmlToPlainText(job.texto);
       const chunks = chunkText(text, 4000);
-      console.log(`🎙  ${materia} (${text.length} caracteres, ${chunks.length} parte(s))...`);
+      console.log(`🎙  ${job.id} (${text.length} caracteres, ${chunks.length} parte(s))...`);
       let sampleRate = 24000;
       const pcmParts = [];
       for(const chunk of chunks){
@@ -204,7 +217,7 @@ async function main(){
       fs.writeFileSync(outFile, wav);
       console.log(`   ✅ ${path.relative(ROOT, outFile)}`);
     }catch(err){
-      console.error(`   ❌ erro em ${materia}: ${err.message}`);
+      console.error(`   ❌ erro em ${job.id}: ${err.message}`);
       if(/CREDENTIALS_MISSING|UNAUTHENTICATED|API key not valid|PERMISSION_DENIED/i.test(err.message)){
         console.error("   → Verifique se GOOGLE_API_KEY no .env é uma chave válida do Google AI Studio (ai.google.dev) com a API Gemini habilitada.");
       }

@@ -133,19 +133,34 @@ async function main(){
   const outDir = path.join(ROOT, "audio", "elevenlabs");
   if(!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-  const materias = Object.keys(TEORIA);
-  console.log(`Gerando áudio para ${materias.length} matérias — ElevenLabs, voz ${voiceId}, modelo ${modelId}...\n`);
+  // Matérias com mais de um dia de conteúdo novo guardam a teoria como array —
+  // uma entrada de áudio por parte (teoria-<materia>-parteN.mp3).
+  const allMaterias = Object.keys(TEORIA);
+  const jobs = [];
+  for(const materia of allMaterias){
+    const val = TEORIA[materia];
+    if(Array.isArray(val)){
+      val.forEach((texto, i)=> jobs.push({ materia, id: `${materia}-parte${i+1}`, texto }));
+    } else {
+      jobs.push({ materia, id: materia, texto: val });
+    }
+  }
+  const filtro = process.argv.slice(2);
+  const selected = filtro.length ? jobs.filter(j=>filtro.includes(j.materia)) : jobs;
 
-  for(const materia of materias){
-    const outFile = path.join(outDir, `teoria-${materia}.mp3`);
+  console.log(`Gerando áudio para ${selected.length} parte(s) de teoria — ElevenLabs, voz ${voiceId}, modelo ${modelId}...\n`);
+  if(filtro.length) console.log(`Filtro aplicado: ${filtro.join(", ")}\n`);
+
+  for(const job of selected){
+    const outFile = path.join(outDir, `teoria-${job.id}.mp3`);
     if(fs.existsSync(outFile)){
-      console.log(`⏭  ${materia} — já existe, pulando`);
+      console.log(`⏭  ${job.id} — já existe, pulando`);
       continue;
     }
     try{
-      const text = htmlToPlainText(TEORIA[materia]);
+      const text = htmlToPlainText(job.texto);
       const chunks = chunkText(text, 2000);
-      console.log(`🎙  ${materia} (${text.length} caracteres, ${chunks.length} parte(s))...`);
+      console.log(`🎙  ${job.id} (${text.length} caracteres, ${chunks.length} parte(s))...`);
       const buffers = [];
       for(const chunk of chunks){
         buffers.push(await synthesizeElevenLabs(apiKey, chunk, voiceId, modelId));
@@ -153,7 +168,7 @@ async function main(){
       fs.writeFileSync(outFile, Buffer.concat(buffers));
       console.log(`   ✅ ${path.relative(ROOT, outFile)}`);
     }catch(err){
-      console.error(`   ❌ erro em ${materia}: ${err.message}`);
+      console.error(`   ❌ erro em ${job.id}: ${err.message}`);
       if(/401|unauthorized|invalid_api_key/i.test(err.message)){
         console.error("   → Confira se ELEVENLABS_API_KEY em .env.local está certa e ativa.");
       }
