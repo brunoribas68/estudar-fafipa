@@ -164,8 +164,8 @@ async function main(){
   const model = env.GOOGLE_TTS_MODEL || "gemini-2.5-flash-preview-tts";
 
   const TEORIA = loadTeoria();
-  const outDir = path.join(ROOT, "audio");
-  if(!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+  const outDir = path.join(ROOT, "audio", "gemini");
+  if(!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
   const materias = Object.keys(TEORIA);
   console.log(`Gerando áudio para ${materias.length} matérias — modelo ${model}, voz ${voice}...\n`);

@@ -47,10 +47,17 @@ function toggleSpeak(html, btn){
   speakText(htmlToPlainText(html), btn);
 }
 
-/* ===================== ÁUDIO GRAVADO (voz natural do Google, gerada 1x) =====================
-   Se existir um .mp3 pré-gerado em /audio para a matéria (veja tools/generate-audio.js),
-   usa esse arquivo — é a voz boa. Se não existir (ainda não gerado, ou falhou ao carregar),
-   cai de volta na voz do navegador (toggleSpeak), que é pior mas sempre funciona. */
+/* ===================== ÁUDIO GRAVADO (voz natural, gerada 1x) =====================
+   Dois provedores em paralelo pra comparar qualidade — cada um grava numa pasta própria
+   (veja tools/generate-audio.js para o Gemini e tools/generate-audio-elevenlabs.js para a
+   ElevenLabs). O app tenta cada um na ordem desta lista; o primeiro que tiver o arquivo pra
+   aquela matéria é o que toca. Pra trocar de preferência (ex.: só ElevenLabs), basta reordenar
+   ou remover itens aqui. Se nenhum provedor tiver áudio pra uma matéria ainda, cai pra voz do
+   navegador (toggleSpeak) — pior, mas sempre funciona. */
+const AUDIO_PROVIDERS = [
+  { name: "elevenlabs", ext: "mp3" },
+  { name: "gemini", ext: "wav" }
+];
 let theoryAudioEl = null;
 function stopTheoryAudio(){
   if(theoryAudioEl){ theoryAudioEl.pause(); theoryAudioEl = null; }
@@ -67,14 +74,22 @@ function toggleTheoryAudio(materia, html, btn){
     return;
   }
   btn.textContent = "⏳ Carregando áudio...";
-  const audio = new Audio(`audio/teoria-${materia}.wav`);
+  tryAudioProvider(0, materia, html, btn);
+}
+function tryAudioProvider(idx, materia, html, btn){
+  if(idx >= AUDIO_PROVIDERS.length){
+    // nenhum provedor tinha áudio gravado pra esta matéria — usa a voz do navegador
+    toggleSpeak(html, btn);
+    return;
+  }
+  const { name, ext } = AUDIO_PROVIDERS[idx];
+  const audio = new Audio(`audio/${name}/teoria-${materia}.${ext}`);
   theoryAudioEl = audio;
   audio.addEventListener("playing", ()=>{ btn.textContent = "⏸️ Parar leitura"; });
   audio.addEventListener("ended", ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; theoryAudioEl = null; });
   audio.addEventListener("error", ()=>{
-    // sem áudio gravado pra esta matéria ainda — usa a voz do navegador
     theoryAudioEl = null;
-    toggleSpeak(html, btn);
+    tryAudioProvider(idx + 1, materia, html, btn);
   });
   audio.play().catch(()=>{});
 }

@@ -32,8 +32,22 @@ Clicar numa alternativa só **seleciona** ela (fica destacada) — nada é revel
 
 ## Voz e imagens
 
-- O botão **🔊 Ouvir este conteúdo** usa a síntese de voz nativa do navegador (Web Speech API) — funciona offline, sem depender de serviço externo, e usa a melhor voz em português já instalada no seu sistema operacional.
+- O botão **🔊 Ouvir este conteúdo** toca, por padrão, um áudio gravado com voz natural (ElevenLabs ou Gemini, veja abaixo). Se nenhum dos dois tiver sido gerado ainda para aquela matéria, cai automaticamente para a síntese de voz nativa do navegador (Web Speech API) — pior, mas sempre funciona offline, sem depender de internet.
 - As imagens em `images/` são diagramas originais em SVG, um por matéria, feitos para fixar contrastes e sequências-chave (ex.: decadência × prescrição, ciclo orçamentário PPA→LDO→LOA).
+
+### Gerando os áudios de teoria (voz natural)
+
+Os áudios **não ficam sendo gerados a cada clique** — são gerados uma vez, salvos em `/audio` e comitados no repositório, como qualquer outro arquivo estático. Há dois provedores possíveis, cada um numa pasta própria, pra comparar qual soa melhor; o app tenta `audio/elevenlabs/` primeiro e cai para `audio/gemini/` se não achar (ordem configurável em `AUDIO_PROVIDERS`, no topo de `app.js`).
+
+1. Copie `.env.example` para `.env` (e, se for usar a ElevenLabs pela CLI oficial, ela cria um `.env.local` — os dois funcionam) e cole sua(s) chave(s) de API.
+2. Rode um dos dois (ou os dois, pra comparar):
+   ```bash
+   node tools/generate-audio.js              # Gemini → audio/gemini/*.wav
+   node tools/generate-audio-elevenlabs.js   # ElevenLabs → audio/elevenlabs/*.mp3
+   ```
+3. Os arquivos aparecem em `/audio/<provedor>/teoria-<materia>.<ext>`. Comite e dê push normalmente.
+
+Nenhuma chave de API é commitada — `.env` e `.env.local` ficam fora do git (`.gitignore`).
 
 ## Estrutura dos arquivos
 
