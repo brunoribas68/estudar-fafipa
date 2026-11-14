@@ -32,7 +32,7 @@ function speakText(text, btn){
   utter.rate = 0.97;
   utter.pitch = 1.0;
   if(btn){
-    utter.onstart = ()=>{ btn.textContent = "⏸️ Parar leitura"; };
+    utter.onstart = ()=>{ btn.textContent = "⏸ Parar leitura"; };
     utter.onend = ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; };
     utter.onerror = ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; };
   }
@@ -74,7 +74,7 @@ function buildAudioPlayer(materia, html){
   const wrap = document.createElement("div");
   wrap.className = "audio-player";
   wrap.innerHTML = `
-    <button class="ap-btn ap-playpause" title="Tocar/pausar">▶️</button>
+    <button class="ap-btn ap-playpause" title="Tocar/pausar">▶</button>
     <div class="ap-progress disabled"><div class="ap-progress-fill"></div></div>
     <span class="ap-time">0:00</span>
     <button class="ap-btn ap-speed" title="Velocidade">1x</button>`;
@@ -108,9 +108,9 @@ function buildAudioPlayer(materia, html){
     const v = pickPtVoice();
     if(v) utter.voice = v;
     utter.rate = SPEED_STEPS[speedIdx];
-    utter.onstart = ()=>{ ttsPlaying = true; playBtn.textContent = "⏸️"; };
-    utter.onend = ()=>{ ttsPlaying = false; playBtn.textContent = "▶️"; };
-    utter.onerror = ()=>{ ttsPlaying = false; playBtn.textContent = "▶️"; };
+    utter.onstart = ()=>{ ttsPlaying = true; playBtn.textContent = "⏸"; };
+    utter.onend = ()=>{ ttsPlaying = false; playBtn.textContent = "▶"; };
+    utter.onerror = ()=>{ ttsPlaying = false; playBtn.textContent = "▶"; };
     window.speechSynthesis.speak(utter);
   }
 
@@ -129,7 +129,7 @@ function buildAudioPlayer(materia, html){
       fill.style.width = pct + "%";
       timeEl.textContent = `${formatTime(a.currentTime)} / ${formatTime(a.duration)}`;
     });
-    a.addEventListener("ended", ()=>{ playBtn.textContent = "▶️"; fill.style.width = "0%"; });
+    a.addEventListener("ended", ()=>{ playBtn.textContent = "▶"; fill.style.width = "0%"; });
     a.addEventListener("error", ()=>{ tryAudioProvider(idx + 1); }, { once: true });
     a.addEventListener("canplay", ()=>{
       mode = "audio";
@@ -137,22 +137,22 @@ function buildAudioPlayer(materia, html){
       theoryAudioEl = a;
       progress.classList.remove("disabled");
       a.play();
-      playBtn.textContent = "⏸️";
+      playBtn.textContent = "⏸";
     }, { once: true });
   }
 
   playBtn.addEventListener("click", ()=>{
     if(mode === "audio" && audio){
-      if(audio.paused){ audio.play(); playBtn.textContent = "⏸️"; }
-      else { audio.pause(); playBtn.textContent = "▶️"; }
+      if(audio.paused){ audio.play(); playBtn.textContent = "⏸"; }
+      else { audio.pause(); playBtn.textContent = "▶"; }
       return;
     }
     if(mode === "tts"){
-      if(ttsPlaying){ window.speechSynthesis.cancel(); ttsPlaying = false; playBtn.textContent = "▶️"; }
+      if(ttsPlaying){ window.speechSynthesis.cancel(); ttsPlaying = false; playBtn.textContent = "▶"; }
       else speakWithControls();
       return;
     }
-    playBtn.textContent = "⏳";
+    playBtn.textContent = "⋯";
     tryAudioProvider(0);
   });
 
