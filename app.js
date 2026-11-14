@@ -47,6 +47,56 @@ function toggleSpeak(html, btn){
   speakText(htmlToPlainText(html), btn);
 }
 
+/* ===================== QUIZ ITEM (seleção + confirmação) =====================
+   Antes, clicar numa alternativa já revelava a resposta na hora — fácil de
+   responder errado sem querer. Agora: clica pra SELECIONAR, e só conta
+   quando aperta "Confirmar resposta". */
+function buildQuizItem(q, opts){
+  const tagLabel = opts.tag;
+  const explainId = opts.explainId;
+  const trackStats = !!opts.trackStats;
+  const el = document.createElement("div");
+  el.className = "quiz-item";
+  el.innerHTML = `<span class="quiz-tag">${tagLabel}</span>
+    <div class="quiz-q">${q.enunciado}</div>
+    <div class="quiz-opts">${q.opcoes.map((op,i)=>`<button class="quiz-opt" data-i="${i}">${String.fromCharCode(65+i)}) ${op}</button>`).join("")}</div>
+    <div class="quiz-confirm-row">
+      <button class="btn-primary quiz-confirm-btn" disabled>Confirmar resposta</button>
+    </div>
+    <div class="quiz-explain" id="${explainId}">${q.explicacao}</div>`;
+  let selected = null;
+  const optBtns = Array.from(el.querySelectorAll(".quiz-opt"));
+  const confirmBtn = el.querySelector(".quiz-confirm-btn");
+  optBtns.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(el.dataset.answered) return;
+      optBtns.forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selected = parseInt(btn.dataset.i,10);
+      confirmBtn.disabled = false;
+    });
+  });
+  confirmBtn.addEventListener("click", ()=>{
+    if(el.dataset.answered || selected===null) return;
+    el.dataset.answered = "1";
+    const correct = selected===q.correta;
+    optBtns[selected].classList.remove("selected");
+    optBtns[selected].classList.add(correct?"correct":"wrong");
+    if(!correct) optBtns[q.correta].classList.add("correct");
+    optBtns.forEach(b=>b.disabled=true);
+    confirmBtn.style.display = "none";
+    document.getElementById(explainId).classList.add("show");
+    if(trackStats){
+      STORE.quizStats.attempted++;
+      if(correct) STORE.quizStats.correct++;
+      STORE.quizStats.byId[q.id] = correct;
+      saveStore();
+      if(typeof renderDashboard==="function") renderDashboard();
+    }
+  });
+  return el;
+}
+
 /* ===================== STORAGE ===================== */
 const STORE_KEY = "fafipa_estudos_v1";
 function loadStore(){
@@ -294,26 +344,7 @@ function renderStepQuiz(content, entry){
     wrap.innerHTML = `<p class="muted">Ainda não há questões cadastradas para esta matéria — siga para concluir.</p>`;
   }
   list.forEach(q=>{
-    const el = document.createElement("div");
-    el.className = "quiz-item";
-    el.innerHTML = `<span class="quiz-tag">${MATERIA_LABEL[q.materia]}</span>
-      <div class="quiz-q">${q.enunciado}</div>
-      <div class="quiz-opts">${q.opcoes.map((op,i)=>`<button class="quiz-opt" data-i="${i}">${String.fromCharCode(65+i)}) ${op}</button>`).join("")}</div>
-      <div class="quiz-explain" id="exp-${q.id}-t">${q.explicacao}</div>`;
-    el.querySelectorAll(".quiz-opt").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        if(el.dataset.answered) return;
-        el.dataset.answered="1";
-        const i = parseInt(btn.dataset.i,10);
-        const correct = i===q.correta;
-        btn.classList.add(correct?"correct":"wrong");
-        if(!correct) el.querySelectorAll(".quiz-opt")[q.correta].classList.add("correct");
-        document.getElementById("exp-"+q.id+"-t").classList.add("show");
-        STORE.quizStats.attempted++;
-        if(correct) STORE.quizStats.correct++;
-        saveStore();
-      });
-    });
+    const el = buildQuizItem(q, {tag: MATERIA_LABEL[q.materia], explainId: "exp-"+q.id+"-t", trackStats:true});
     wrap.appendChild(el);
   });
   if(entry.materia==="dir-tributario"){
@@ -527,28 +558,7 @@ function renderQuizPanel(){
   const area = document.getElementById("quiz-area");
   area.innerHTML = "";
   list.forEach(q=>{
-    const el = document.createElement("div");
-    el.className = "quiz-item";
-    el.innerHTML = `<span class="quiz-tag">${MATERIA_LABEL[q.materia]}</span>
-      <div class="quiz-q">${q.enunciado}</div>
-      <div class="quiz-opts">${q.opcoes.map((op,i)=>`<button class="quiz-opt" data-i="${i}">${String.fromCharCode(65+i)}) ${op}</button>`).join("")}</div>
-      <div class="quiz-explain" id="exp-${q.id}">${q.explicacao}</div>`;
-    el.querySelectorAll(".quiz-opt").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        if(el.dataset.answered) return;
-        el.dataset.answered = "1";
-        const i = parseInt(btn.dataset.i,10);
-        const correct = i===q.correta;
-        btn.classList.add(correct?"correct":"wrong");
-        if(!correct) el.querySelectorAll(".quiz-opt")[q.correta].classList.add("correct");
-        document.getElementById("exp-"+q.id).classList.add("show");
-        STORE.quizStats.attempted++;
-        if(correct) STORE.quizStats.correct++;
-        STORE.quizStats.byId[q.id] = correct;
-        saveStore();
-        renderDashboard();
-      });
-    });
+    const el = buildQuizItem(q, {tag: MATERIA_LABEL[q.materia], explainId: "exp-"+q.id, trackStats:true});
     area.appendChild(el);
   });
 }
@@ -563,23 +573,7 @@ function renderProvasFafipa(){
   const wrap = document.getElementById("provas-area");
   wrap.innerHTML = "";
   PROVAS_FAFIPA.forEach(q=>{
-    const el = document.createElement("div");
-    el.className = "quiz-item";
-    el.innerHTML = `<span class="quiz-tag">🔵 ${q.fonte}</span>
-      <div class="quiz-q">${q.enunciado}</div>
-      <div class="quiz-opts">${q.opcoes.map((op,i)=>`<button class="quiz-opt" data-i="${i}">${String.fromCharCode(65+i)}) ${op}</button>`).join("")}</div>
-      <div class="quiz-explain" id="exp-${q.id}">${q.explicacao}</div>`;
-    el.querySelectorAll(".quiz-opt").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        if(el.dataset.answered) return;
-        el.dataset.answered = "1";
-        const i = parseInt(btn.dataset.i,10);
-        const correct = i===q.correta;
-        btn.classList.add(correct?"correct":"wrong");
-        if(!correct) el.querySelectorAll(".quiz-opt")[q.correta].classList.add("correct");
-        document.getElementById("exp-"+q.id).classList.add("show");
-      });
-    });
+    const el = buildQuizItem(q, {tag: "🔵 "+q.fonte, explainId: "exp-"+q.id, trackStats:false});
     wrap.appendChild(el);
   });
 }
