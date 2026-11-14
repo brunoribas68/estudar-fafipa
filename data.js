@@ -63,16 +63,30 @@ const MATERIA_LABEL = {
 /* ===================== FLASHCARDS ===================== */
 // grade usa SM-2 simplificado: 0=difícil,1=médio,2=fácil
 let idc = 1;
-function fc(materia, pergunta, resposta){ return {id:"fc"+(idc++), materia, pergunta, resposta}; }
+// `parte` é opcional — só usado nas matérias com teoria dividida em várias
+// partes (ver CRONOGRAMA). Card sem `parte` aparece em qualquer dia da matéria;
+// card com `parte` só aparece no dia daquele trecho específico, pra não repetir
+// o mesmo card em dias diferentes de uma matéria longa.
+function fc(materia, pergunta, resposta, parte){ return {id:"fc"+(idc++), materia, pergunta, resposta, parte}; }
 
 const FLASHCARDS = [
-  // Português
-  fc("portugues","O que é coesão textual?","É a ligação gramatical entre as partes do texto (uso de pronomes, conectivos, repetição controlada) que garante que as frases se encadeiem."),
-  fc("portugues","Diferencie coesão de coerência.","Coesão é a ligação gramatical/lexical entre as partes do texto; coerência é o sentido lógico global, a compreensão unificada do texto como um todo."),
-  fc("portugues","Cite 3 tipos de gêneros textuais comuns em provas.","Narrativo, dissertativo-argumentativo, descritivo, injuntivo (instrucional), expositivo."),
-  fc("portugues","Qual a regra geral do 'porquê' separado e com acento, no fim de frase?","'Por que' (separado, sem acento) é usado em perguntas e antes de substantivo oculto; 'porquê' (junto, com acento) é substantivo, geralmente antecedido de artigo: 'o porquê'."),
-  fc("portugues","O que é concordância verbal com sujeito composto anteposto ao verbo?","O verbo geralmente vai para o plural quando o sujeito composto vem antes dele: 'João e Maria chegaram'."),
-  fc("portugues","Dê um exemplo de função sintática do predicativo do sujeito.","Em 'A água é a mãe', 'a mãe' é predicativo do sujeito — atribui uma característica/identidade ao sujeito através de verbo de ligação."),
+  // Português — parte 1 (interpretação, coesão/coerência, variação linguística, gêneros)
+  fc("portugues","O que é coesão textual?","É a ligação gramatical entre as partes do texto (uso de pronomes, conectivos, repetição controlada) que garante que as frases se encadeiem.",1),
+  fc("portugues","Diferencie coesão de coerência.","Coesão é a ligação gramatical/lexical entre as partes do texto; coerência é o sentido lógico global, a compreensão unificada do texto como um todo.",1),
+  fc("portugues","Cite 3 tipos de gêneros textuais comuns em provas.","Narrativo, dissertativo-argumentativo, descritivo, injuntivo (instrucional), expositivo.",1),
+  fc("portugues","O que é variação linguística?","É a forma como a língua muda conforme região, classe social e grau de formalidade — não existe 'errado', existe adequado ou inadequado ao contexto.",1),
+
+  // Português — parte 2 (ortografia, classes de palavras, semântica, regência, crase)
+  fc("portugues","Qual a regra geral do 'porquê' separado e com acento, no fim de frase?","'Por que' (separado, sem acento) é usado em perguntas e antes de substantivo oculto; 'porquê' (junto, com acento) é substantivo, geralmente antecedido de artigo: 'o porquê'.",2),
+  fc("portugues","Qual a regra prática pra saber se há crase antes de uma palavra feminina?","Troque a palavra feminina por uma masculina equivalente: se aparecer 'ao', há crase ('Fui à prefeitura' / 'Fui ao órgão').",2),
+  fc("portugues","'Assistir' pede a preposição 'a' sempre?","Não — só quando significa 'ver' ('assisti ao filme'); quando significa 'ajudar' ou 'morar', não pede preposição.",2),
+  fc("portugues","O que é polissemia?","É a capacidade de uma mesma palavra ter vários sentidos diferentes conforme o contexto.",2),
+
+  // Português — parte 3 (funções sintáticas, concordância, pontuação, literatura)
+  fc("portugues","O que é concordância verbal com sujeito composto anteposto ao verbo?","O verbo geralmente vai para o plural quando o sujeito composto vem antes dele: 'João e Maria chegaram'.",3),
+  fc("portugues","Dê um exemplo de função sintática do predicativo do sujeito.","Em 'A água é a mãe', 'a mãe' é predicativo do sujeito — atribui uma característica/identidade ao sujeito através de verbo de ligação.",3),
+  fc("portugues","Por que 'o adjunto adnominal' não é a mesma coisa que 'o complemento nominal'?","Adjunto adnominal modifica um substantivo e é ligado a termos de sentido completo; complemento nominal completa o sentido de um nome de sentido incompleto (geralmente exige preposição).",3),
+  fc("portugues","Cite um erro clássico de pontuação cobrado em prova.","Vírgula separando sujeito do predicado, ou o verbo do seu complemento, sem motivo — ex.: 'O candidato, fez a prova' (errado).",3),
 
   // Informática
   fc("informatica","Diferencie hardware de software.","Hardware é a parte física do computador (CPU, memória, periféricos); software é o conjunto de programas e sistemas que o fazem funcionar."),
@@ -91,20 +105,30 @@ const FLASHCARDS = [
   fc("leg-municipal","O Município tem Poder Judiciário próprio?","Não. A Justiça é estadual ou federal; o Município só tem Executivo e Legislativo."),
 
   // Direito Constitucional
-  fc("dir-constitucional","Quais são os princípios da Administração Pública no art. 37 da CF? (sigla)","LIMPE: Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência."),
-  fc("dir-constitucional","Quando o servidor efetivo adquire estabilidade?","Após 3 anos de efetivo exercício, com avaliação de desempenho satisfatória."),
-  fc("dir-constitucional","A responsabilidade civil do Estado é objetiva ou subjetiva?","Objetiva — independe de culpa do agente; cabe direito de regresso contra o agente em caso de dolo ou culpa."),
-  fc("dir-constitucional","Quais são as formas de Estado e de governo do Brasil?","Forma de Estado: federativa. Forma de governo: república. Sistema: presidencialista."),
-  fc("dir-constitucional","O que garante o mandado de segurança?","Protege direito líquido e certo não amparado por habeas corpus ou habeas data."),
-  fc("dir-constitucional","Cite os entes da organização político-administrativa (art. 18, CF).","União, Estados, Distrito Federal e Municípios, todos autônomos."),
+  // Dir. Constitucional — parte 1 (princípios fundamentais, direitos, remédios, organização dos Poderes)
+  fc("dir-constitucional","Quais são as formas de Estado e de governo do Brasil?","Forma de Estado: federativa. Forma de governo: república. Sistema: presidencialista.",1),
+  fc("dir-constitucional","O que garante o mandado de segurança?","Protege direito líquido e certo não amparado por habeas corpus ou habeas data.",1),
+  fc("dir-constitucional","Cite os entes da organização político-administrativa (art. 18, CF).","União, Estados, Distrito Federal e Municípios, todos autônomos.",1),
+  fc("dir-constitucional","O Município tem Poder Judiciário próprio?","Não — o Município tem autonomia (auto-organização, autogoverno, autolegislação, autoadministração), mas não possui Judiciário próprio.",1),
+
+  // Dir. Constitucional — parte 2 (Administração Pública, LIMPE, Tribunais de Contas)
+  fc("dir-constitucional","Quais são os princípios da Administração Pública no art. 37 da CF? (sigla)","LIMPE: Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência.",2),
+  fc("dir-constitucional","Quando o servidor efetivo adquire estabilidade?","Após 3 anos de efetivo exercício, com avaliação de desempenho satisfatória.",2),
+  fc("dir-constitucional","A responsabilidade civil do Estado é objetiva ou subjetiva?","Objetiva — independe de culpa do agente; cabe direito de regresso contra o agente em caso de dolo ou culpa.",2),
+  fc("dir-constitucional","Quem julga as contas de governo do Prefeito e quem julga as contas de gestão de outros administradores?","O Tribunal de Contas só emite PARECER PRÉVIO sobre as contas do Prefeito — quem julga é a Câmara Municipal. Já as contas de gestão de outros administradores são julgadas pelo próprio Tribunal de Contas.",2),
 
   // Direito Administrativo
-  fc("dir-administrativo","Diferencie anulação de revogação.","Anulação extingue ato ilegal, com efeito retroativo (ex tunc). Revogação extingue ato legal mas inconveniente, com efeito ex nunc, e só a Administração pode revogar."),
-  fc("dir-administrativo","O que é presunção de legitimidade do ato administrativo?","O ato se presume legal e verdadeiro até prova em contrário."),
-  fc("dir-administrativo","O que é poder de polícia?","Poder da Administração de limitar o exercício de direitos individuais em favor do interesse coletivo (ex.: fiscalização sanitária, tributária)."),
-  fc("dir-administrativo","Diferencie ato vinculado de ato discricionário.","No vinculado a lei não deixa margem de escolha; no discricionário há margem de escolha quanto a oportunidade e conveniência, dentro dos limites legais."),
-  fc("dir-administrativo","O que mudou na Lei de Improbidade (LIA) com a reforma de 2021 para danos ao erário?","Passou a exigir dolo (não basta mais culpa) para caracterizar ato de improbidade que causa prejuízo ao erário."),
-  fc("dir-administrativo","Qual a modalidade padrão de licitação para bens e serviços comuns (Lei 14.133/2021)?","Pregão."),
+  // Dir. Administrativo — parte 1 (regime jurídico, atos administrativos, invalidação)
+  fc("dir-administrativo","Diferencie anulação de revogação.","Anulação extingue ato ilegal, com efeito retroativo (ex tunc). Revogação extingue ato legal mas inconveniente, com efeito ex nunc, e só a Administração pode revogar.",1),
+  fc("dir-administrativo","O que é presunção de legitimidade do ato administrativo?","O ato se presume legal e verdadeiro até prova em contrário.",1),
+  fc("dir-administrativo","Diferencie ato vinculado de ato discricionário.","No vinculado a lei não deixa margem de escolha; no discricionário há margem de escolha quanto a oportunidade e conveniência, dentro dos limites legais.",1),
+  fc("dir-administrativo","O que é convalidação de um ato administrativo?","É a correção de um defeito sanável do ato, com efeito retroativo — diferente da anulação, que o extingue.",1),
+
+  // Dir. Administrativo — parte 2 (poderes, organização, licitações, improbidade, controle)
+  fc("dir-administrativo","O que é poder de polícia?","Poder da Administração de limitar o exercício de direitos individuais em favor do interesse coletivo (ex.: fiscalização sanitária, tributária).",2),
+  fc("dir-administrativo","O que mudou na Lei de Improbidade (LIA) com a reforma de 2021 para danos ao erário?","Passou a exigir dolo (não basta mais culpa) para caracterizar ato de improbidade que causa prejuízo ao erário.",2),
+  fc("dir-administrativo","Qual a modalidade padrão de licitação para bens e serviços comuns (Lei 14.133/2021)?","Pregão.",2),
+  fc("dir-administrativo","Diferencie dispensa de inexigibilidade de licitação.","Dispensa: a licitação é viável, mas a lei dispensa (ex.: valor baixo, emergência). Inexigibilidade: a licitação é inviável, pois não há competição possível (ex.: fornecedor exclusivo).",2),
 
   // Raciocínio Lógico / Estatística / Mat. Financeira
   fc("raciocinio","Qual a negação de 'Todo A é B'?","'Algum A não é B'."),
@@ -114,12 +138,18 @@ const FLASHCARDS = [
   fc("raciocinio","O que mede o desvio padrão?","O quanto, em média, os dados se afastam do valor central (média) — é a principal medida de dispersão."),
 
   // Direito Tributário
-  fc("dir-tributario","Qual a definição legal de tributo (art. 3º CTN)?","Prestação pecuniária compulsória, em moeda, que não constitua sanção de ato ilícito, instituída em lei e cobrada por atividade administrativa plenamente vinculada."),
-  fc("dir-tributario","Diferencie competência tributária de capacidade tributária ativa.","Competência (criar o tributo) é indelegável; capacidade tributária ativa (cobrar/fiscalizar/arrecadar) pode ser delegada a outra pessoa jurídica de direito público."),
-  fc("dir-tributario","Diferencie decadência de prescrição tributária.","Decadência extingue o direito de lançar (constituir) o crédito; prescrição extingue o direito de cobrar/executar o crédito já constituído. Ambas em 5 anos."),
-  fc("dir-tributario","Cite as causas de suspensão do crédito tributário (art. 151 CTN).","Moratória, depósito do montante integral, reclamações/recursos administrativos, liminar/tutela antecipada, parcelamento."),
-  fc("dir-tributario","Quais são as causas de exclusão do crédito tributário (art. 175 CTN)?","Isenção e anistia."),
-  fc("dir-tributario","O que é lançamento por homologação? Dê um exemplo municipal.","O contribuinte apura e paga antecipadamente, sujeito a homologação posterior do fisco; exemplo: ISSQN na maioria dos municípios."),
+  // Dir. Tributário — parte 1 (conceito, espécies, competência, princípios constitucionais)
+  fc("dir-tributario","Qual a definição legal de tributo (art. 3º CTN)?","Prestação pecuniária compulsória, em moeda, que não constitua sanção de ato ilícito, instituída em lei e cobrada por atividade administrativa plenamente vinculada.",1),
+  fc("dir-tributario","Diferencie competência tributária de capacidade tributária ativa.","Competência (criar o tributo) é indelegável; capacidade tributária ativa (cobrar/fiscalizar/arrecadar) pode ser delegada a outra pessoa jurídica de direito público.",1),
+  fc("dir-tributario","O que é a anterioridade nonagesimal?","Princípio pelo qual o tributo só pode ser cobrado 90 dias após a publicação da lei que o criou ou aumentou (além da anterioridade anual).",1),
+  fc("dir-tributario","Diferencie imposto de taxa.","Imposto é tributo não vinculado a nenhuma atividade estatal específica; taxa é vinculada a um serviço público específico/divisível ou ao exercício do poder de polícia.",1),
+
+  // Dir. Tributário — parte 2 (obrigação, sujeitos, crédito tributário, decadência/prescrição, imunidades)
+  fc("dir-tributario","Diferencie decadência de prescrição tributária.","Decadência extingue o direito de lançar (constituir) o crédito; prescrição extingue o direito de cobrar/executar o crédito já constituído. Ambas em 5 anos.",2),
+  fc("dir-tributario","Cite as causas de suspensão do crédito tributário (art. 151 CTN).","Moratória, depósito do montante integral, reclamações/recursos administrativos, liminar/tutela antecipada, parcelamento.",2),
+  fc("dir-tributario","Quais são as causas de exclusão do crédito tributário (art. 175 CTN)?","Isenção e anistia.",2),
+  fc("dir-tributario","O que é lançamento por homologação? Dê um exemplo municipal.","O contribuinte apura e paga antecipadamente, sujeito a homologação posterior do fisco; exemplo: ISSQN na maioria dos municípios.",2),
+  fc("dir-tributario","Imunidade tributária é o mesmo que isenção?","Não. Imunidade é limitação constitucional ao poder de tributar (o tributo nem existe para aquele caso); isenção é dispensa legal de pagamento de um tributo que, sem a lei isentiva, seria devido.",2),
 
   // ISSQN
   fc("issqn","Qual a base normativa nacional do ISSQN e as alíquotas mínima/máxima?","Lei Complementar 116/2003; alíquota mínima de 2% (EC 37/2002) e máxima de 5%."),
@@ -178,24 +208,47 @@ const FLASHCARDS = [
 
 /* ===================== QUIZ (estilo FAFIPA) ===================== */
 let idq = 1;
-function qz(materia, enunciado, opcoes, correta, explicacao){
-  return {id:"q"+(idq++), materia, enunciado, opcoes, correta, explicacao};
+// `parte` opcional, mesma lógica do fc() acima.
+function qz(materia, enunciado, opcoes, correta, explicacao, parte){
+  return {id:"q"+(idq++), materia, enunciado, opcoes, correta, explicacao, parte};
 }
 
 const QUIZZES = [
-  // Português
+  // Português — parte 1
   qz("portugues","Assinale a alternativa que define corretamente 'coerência textual':",
     ["A repetição de palavras ao longo do texto.","A ligação lógica de sentido entre as ideias do texto como um todo.","O uso exclusivo de conectivos.","A ortografia correta das palavras.","A pontuação adequada de cada frase."],
-    1,"Coerência é a unidade de sentido do texto; coesão é a ligação gramatical entre as partes."),
+    1,"Coerência é a unidade de sentido do texto; coesão é a ligação gramatical entre as partes.",1),
   qz("portugues","Em 'Mas a enchente também traz destruição', o conectivo 'mas' estabelece relação de:",
     ["Adição","Conclusão","Oposição/contraste","Causa","Finalidade"],
-    2,"'Mas' é conjunção adversativa, indicando contraste/oposição entre as ideias."),
-  qz("portugues","Sobre o uso de 'porquê' (junto, com acento), é correto afirmar que:",
-    ["É sempre usado em perguntas diretas.","Funciona como substantivo, geralmente precedido de artigo ('o porquê').","É usado antes de verbos no infinitivo.","Nunca é usado em frases afirmativas.","É sinônimo de 'por que' em qualquer contexto."],
-    1,"'Porquê' junto e acentuado é substantivo, equivalente a 'motivo', e normalmente vem com artigo."),
+    2,"'Mas' é conjunção adversativa, indicando contraste/oposição entre as ideias.",1),
   qz("portugues","Analise: I. Gêneros textuais variam conforme a função social do texto. II. Tipologia textual refere-se à estrutura (narrar, descrever, argumentar). III. Coesão garante apenas a correção ortográfica. Está(ão) correta(s):",
     ["Apenas I","Apenas II","Apenas I e II","Apenas III","I, II e III"],
-    2,"I e II estão corretas; III está errada, pois coesão trata da ligação textual, não de ortografia."),
+    2,"I e II estão corretas; III está errada, pois coesão trata da ligação textual, não de ortografia.",1),
+  qz("portugues","A variação linguística diz respeito a:",
+    ["Erros gramaticais que devem ser sempre corrigidos.","Mudanças da língua conforme região, classe social e formalidade — adequação ao contexto.","Apenas diferenças de sotaque regional.","Regras fixas que nunca mudam conforme o contexto.","Uso exclusivo da norma culta em qualquer situação."],
+    1,"Não existe 'certo ou errado' absoluto na variação linguística, existe adequado ou inadequado à situação de comunicação.",1),
+
+  // Português — parte 2
+  qz("portugues","Sobre o uso de 'porquê' (junto, com acento), é correto afirmar que:",
+    ["É sempre usado em perguntas diretas.","Funciona como substantivo, geralmente precedido de artigo ('o porquê').","É usado antes de verbos no infinitivo.","Nunca é usado em frases afirmativas.","É sinônimo de 'por que' em qualquer contexto."],
+    1,"'Porquê' junto e acentuado é substantivo, equivalente a 'motivo', e normalmente vem com artigo.",2),
+  qz("portugues","Em 'O auditor se referia àquela norma revogada', o acento grave (crase) é:",
+    ["Incorreto, pois 'aquela' não aceita crase.","Obrigatório, por ser pronome demonstrativo feminino regido por preposição 'a'.","Opcional, a critério do autor.","Usado apenas por tradição, sem regra.","Incorreto, pois falta o artigo feminino."],
+    1,"'Àquela' é a fusão da preposição 'a' (exigida por 'referir-se a') com o pronome demonstrativo feminino 'aquela'.",2),
+  qz("portugues","Assinale a frase que segue a norma culta cobrada em concursos:",
+    ["Cheguei em Curitiba cedo.","Cheguei a Curitiba cedo.","Assisti o filme (sentido de 'ver').","Fui a prefeitura.","Vou no médico amanhã."],
+    1,"Os verbos 'chegar' e 'ir' pedem a preposição 'a', não 'em', na norma culta cobrada em prova.",2),
+
+  // Português — parte 3
+  qz("portugues","Em 'O candidato, fez a prova com atenção', o uso da vírgula está:",
+    ["Correto, pois separa o sujeito do predicado.","Incorreto, pois vírgula não deve separar sujeito e predicado sem motivo.","Correto, é uma pausa opcional.","Incorreto, falta outra vírgula depois de 'prova'.","Correto, indica aposto."],
+    1,"É um erro clássico de pontuação: vírgula não separa sujeito de predicado (nem verbo de complemento) sem motivo sintático.",3),
+  qz("portugues","Em 'Os candidatos e os fiscais chegaram cedo', a concordância verbal segue a regra de:",
+    ["Sujeito composto anteposto ao verbo → verbo no plural.","Sujeito simples → verbo no singular.","Concordância ideológica (silepse).","Sujeito oculto → verbo impessoal.","Verbo impessoal, não há concordância."],
+    0,"Sujeito composto anteposto ao verbo geralmente leva o verbo ao plural.",3),
+  qz("portugues","O movimento literário marcado pela valorização do nacionalismo, da natureza e do sentimentalismo exagerado, no Brasil do século XIX, é o:",
+    ["Barroco","Arcadismo","Romantismo","Parnasianismo","Simbolismo"],
+    2,"O Romantismo brasileiro (séc. XIX) é marcado pelo nacionalismo, subjetivismo e idealização (amor, natureza, herói nacional).",3),
 
   // Informática
   qz("informatica","A memória que perde seu conteúdo quando o computador é desligado é a:",
@@ -222,27 +275,49 @@ const QUIZZES = [
     ["Apenas pelo Executivo","Pela Câmara Municipal, com auxílio do Tribunal de Contas","Exclusivamente pelo Judiciário","Pelo Ministério Público, isoladamente","Não há controle externo municipal"],
     1,"O controle externo é do Legislativo, auxiliado pelo Tribunal de Contas."),
 
-  // Direito Constitucional
-  qz("dir-constitucional","Os princípios expressos da Administração Pública (art. 37, caput, CF) são conhecidos pela sigla:",
-    ["PICLE","LIMPE","MESCLA","FEITO","CORRETO"],
-    1,"Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência."),
-  qz("dir-constitucional","A responsabilidade civil do Estado por danos causados por seus agentes a terceiros (art. 37, §6º, CF) é do tipo:",
-    ["Subjetiva, dependente de dolo","Objetiva, independente de culpa","Inexistente","Exclusiva do agente público","Limitada a casos de dolo"],
-    1,"Responsabilidade objetiva (teoria do risco administrativo), com direito de regresso em caso de dolo/culpa."),
+  // Direito Constitucional — parte 1
   qz("dir-constitucional","Analise: I. O Brasil adota forma de Estado federativa. II. O Município possui Poder Judiciário próprio. III. A autonomia municipal inclui autogoverno e autolegislação. Está(ão) correta(s):",
     ["Apenas I","Apenas II","Apenas I e III","Apenas II e III","I, II e III"],
-    2,"I e III corretas; II é falsa — o Município não tem Judiciário próprio."),
+    2,"I e III corretas; II é falsa — o Município não tem Judiciário próprio.",1),
+  qz("dir-constitucional","O remédio constitucional que protege o acesso ou retificação de informações da própria pessoa em bancos de dados públicos é:",
+    ["Habeas corpus","Mandado de segurança","Habeas data","Ação popular","Mandado de injunção"],
+    2,"Habeas data garante acesso ou retificação de informações sobre a própria pessoa em bancos de dados públicos.",1),
+  qz("dir-constitucional","Qualquer cidadão pode propor, para anular ato lesivo ao patrimônio público, à moralidade administrativa ou ao meio ambiente, a:",
+    ["Ação civil pública","Ação popular","Mandado de segurança coletivo","Ação direta de inconstitucionalidade","Reclamação constitucional"],
+    1,"Ação popular pode ser proposta por qualquer cidadão contra ato lesivo ao patrimônio público, à moralidade administrativa, ao meio ambiente ou ao patrimônio histórico/cultural.",1),
 
-  // Direito Administrativo
+  // Direito Constitucional — parte 2
+  qz("dir-constitucional","Os princípios expressos da Administração Pública (art. 37, caput, CF) são conhecidos pela sigla:",
+    ["PICLE","LIMPE","MESCLA","FEITO","CORRETO"],
+    1,"Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência.",2),
+  qz("dir-constitucional","A responsabilidade civil do Estado por danos causados por seus agentes a terceiros (art. 37, §6º, CF) é do tipo:",
+    ["Subjetiva, dependente de dolo","Objetiva, independente de culpa","Inexistente","Exclusiva do agente público","Limitada a casos de dolo"],
+    1,"Responsabilidade objetiva (teoria do risco administrativo), com direito de regresso em caso de dolo/culpa.",2),
+  qz("dir-constitucional","Sobre o Tribunal de Contas e as contas do Prefeito, é correto afirmar:",
+    ["O Tribunal de Contas julga diretamente as contas do Prefeito.","O Tribunal de Contas emite parecer prévio; quem julga é a Câmara Municipal.","Somente o Judiciário pode julgar as contas do Prefeito.","As contas do Prefeito não passam por nenhum controle externo.","O parecer do Tribunal de Contas é sempre vinculante e definitivo."],
+    1,"O Tribunal de Contas emite apenas PARECER PRÉVIO sobre as contas de governo do Prefeito; quem julga é a Câmara Municipal.",2),
+
+  // Direito Administrativo — parte 1
   qz("dir-administrativo","A extinção de um ato administrativo ilegal, com efeitos retroativos, é denominada:",
     ["Revogação","Anulação","Convalidação","Ratificação","Caducidade"],
-    1,"Anulação atinge atos ilegais, com efeito ex tunc (retroativo)."),
+    1,"Anulação atinge atos ilegais, com efeito ex tunc (retroativo).",1),
+  qz("dir-administrativo","Somente a Administração pode revogar um ato; o Judiciário:",
+    ["Também pode revogar livremente.","Só pode anular, nunca revogar.","Pode revogar, mas não anular.","Não pode fazer nem uma coisa nem outra.","Pode revogar apenas atos vinculados."],
+    1,"O Judiciário pode anular atos ilegais (controle de legalidade), mas não revogar atos legais por conveniência/oportunidade — isso é exclusivo da Administração.",1),
+  qz("dir-administrativo","Correção de um defeito sanável do ato administrativo, com efeito retroativo, chama-se:",
+    ["Anulação","Revogação","Convalidação","Caducidade","Contraposição"],
+    2,"Convalidação corrige um defeito sanável do ato, mantendo seus efeitos com retroatividade.",1),
+
+  // Direito Administrativo — parte 2
   qz("dir-administrativo","O poder pelo qual a Administração limita direitos individuais em favor do interesse coletivo (ex.: fiscalização tributária) é o poder:",
     ["Disciplinar","Hierárquico","Regulamentar","De polícia","Discricionário"],
-    3,"Definição clássica do poder de polícia administrativa."),
+    3,"Definição clássica do poder de polícia administrativa.",2),
   qz("dir-administrativo","Com a reforma de 2021 na Lei de Improbidade Administrativa, os atos que causam prejuízo ao erário passaram a exigir:",
     ["Mera culpa","Dolo","Responsabilidade objetiva","Nenhum elemento subjetivo","Negligência leve"],
-    1,"Após a Lei 14.230/2021, exige-se dolo para os atos de prejuízo ao erário."),
+    1,"Após a Lei 14.230/2021, exige-se dolo para os atos de prejuízo ao erário.",2),
+  qz("dir-administrativo","Dispensa e inexigibilidade de licitação são a mesma coisa?",
+    ["Sim, são sinônimos.","Não — na dispensa a licitação é viável mas a lei dispensa; na inexigibilidade ela é inviável (sem competição possível).","Não — dispensa é só para obras, inexigibilidade só para serviços.","Sim, ambas exigem autorização do Tribunal de Contas.","Não — inexigibilidade é mais rara que dispensa em qualquer hipótese."],
+    1,"Dispensa: licitação viável, mas dispensada por lei (ex.: valor baixo). Inexigibilidade: licitação inviável, por falta de competição (ex.: fornecedor exclusivo).",2),
 
   // Raciocínio
   qz("raciocinio","A negação da proposição 'Todos os contribuintes pagaram o tributo' é:",
@@ -255,16 +330,24 @@ const QUIZZES = [
     ["Tendência central","Dispersão dos dados em torno da média","Moda dos dados","Frequência relativa apenas","Nenhuma das anteriores"],
     1,"Desvio padrão mede a dispersão/variabilidade dos dados em relação à média."),
 
-  // Direito Tributário
+  // Direito Tributário — parte 1
   qz("dir-tributario","Segundo o art. 3º do CTN, tributo é prestação pecuniária compulsória que:",
     ["Constitui sanção de ato ilícito","Não constitui sanção de ato ilícito e é instituída em lei","Depende da vontade do contribuinte","É cobrada por atividade discricionária","Pode ser instituída por decreto"],
-    1,"A definição legal exclui sanção de ato ilícito e exige instituição por lei."),
+    1,"A definição legal exclui sanção de ato ilícito e exige instituição por lei.",1),
   qz("dir-tributario","A capacidade tributária ativa, diferentemente da competência tributária:",
     ["É sempre indelegável","Pode ser delegada a outra pessoa jurídica de direito público","Só existe para a União","Extingue a competência do ente","É sinônimo de competência"],
-    1,"Capacidade tributária ativa (cobrar/fiscalizar/arrecadar) pode ser delegada."),
+    1,"Capacidade tributária ativa (cobrar/fiscalizar/arrecadar) pode ser delegada.",1),
+  qz("dir-tributario","O princípio que impede cobrar o tributo antes de 90 dias da publicação da lei que o instituiu ou aumentou é a anterioridade:",
+    ["Anual","Nonagesimal","Irretroativa","Isonômica","Confiscatória"],
+    1,"Anterioridade nonagesimal exige um prazo mínimo de 90 dias entre a publicação da lei e a cobrança do tributo.",1),
+
+  // Direito Tributário — parte 2
   qz("dir-tributario","A perda do direito de a autoridade lançar o crédito tributário pelo decurso do prazo legal denomina-se:",
     ["Prescrição","Decadência","Remissão","Anistia","Transação"],
-    1,"Decadência atinge o direito de lançar; prescrição atinge o direito de cobrar."),
+    1,"Decadência atinge o direito de lançar; prescrição atinge o direito de cobrar.",2),
+  qz("dir-tributario","Imunidade tributária e isenção são institutos equivalentes?",
+    ["Sim, ambos são concedidos por lei ordinária.","Não — imunidade é limitação constitucional ao poder de tributar; isenção é dispensa legal infraconstitucional.","Sim, ambos impedem a existência do tributo.","Não — isenção é sempre mais ampla que imunidade.","Sim, mas só para impostos municipais."],
+    1,"Imunidade é prevista na Constituição e impede que o tributo exista para aquele caso; isenção é dispensa de pagamento concedida por lei ordinária/específica.",2),
 
   // ISSQN
   qz("issqn","As alíquotas mínima e máxima do ISSQN, fixadas pela legislação complementar federal, são respectivamente:",

@@ -400,7 +400,10 @@ function renderStepTeoria(content, entry){
 function renderStepFlashcards(content, entry){
   const t = todayStr();
   let queue;
-  if(entry.materia) queue = FLASHCARDS.filter(c=>c.materia===entry.materia);
+  // matérias com teoria dividida em partes (campo `entry.parte`) só mostram os
+  // cards marcados daquela parte (ou sem `parte`, que vale pra qualquer dia),
+  // pra não repetir os mesmos cards em todos os dias da mesma matéria.
+  if(entry.materia) queue = FLASHCARDS.filter(c=>c.materia===entry.materia && (!entry.parte || !c.parte || c.parte===entry.parte));
   else queue = FLASHCARDS.filter(c=>{ const st=STORE.cards[c.id]; return !st || st.due<=t; }).slice(0,10);
   if(queue.length===0) queue = FLASHCARDS.filter(c=>c.materia===entry.materia || true).slice(0,8);
   for(let i=queue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [queue[i],queue[j]]=[queue[j],queue[i]]; }
@@ -461,7 +464,8 @@ function renderStepFlashcards(content, entry){
 
 function renderStepQuiz(content, entry){
   let list;
-  if(entry.materia) list = QUIZZES.filter(q=>q.materia===entry.materia);
+  // mesma lógica de recorte por parte usada nos flashcards (ver renderStepFlashcards).
+  if(entry.materia) list = QUIZZES.filter(q=>q.materia===entry.materia && (!entry.parte || !q.parte || q.parte===entry.parte));
   else list = QUIZZES.slice();
   for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
   const max = entry.tipo==="simulado" ? Math.min(15,list.length) : Math.min(5,list.length);
