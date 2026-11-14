@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 260" width="420" height="260">
+<rect width="420" height="260" fill="#f5f3ff"/>
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+<path d="M0,0 L8,3 L0,6 Z" fill="#6d4bda"/>
+</marker>
+</defs>
+<text x="210.0" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#6d4bda" font-family="Segoe UI, sans-serif">Princípios da Administração — LIMPE</text><rect x="30.0" y="55" width="360" height="55" rx="12" fill="#ffffff" stroke="#6d4bda" stroke-width="2.5"/>
+<rect x="30.0" y="55" width="360" height="6" rx="3" fill="#6d4bda"/>
+<text x="210.0" y="82.5" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="210.0" dy="0">Legalidade + Impessoalidade</tspan></text>
+<rect x="65.0" y="124" width="290" height="55" rx="12" fill="#ffffff" stroke="#17a673" stroke-width="2.5"/>
+<rect x="65.0" y="124" width="290" height="6" rx="3" fill="#17a673"/>
+<text x="210.0" y="151.5" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="210.0" dy="0">Moralidade + Publicidade</tspan></text>
+<rect x="100.0" y="193" width="220" height="55" rx="12" fill="#ffffff" stroke="#e8673c" stroke-width="2.5"/>
+<rect x="100.0" y="193" width="220" height="6" rx="3" fill="#e8673c"/>
+<text x="210.0" y="212.5" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="210.0" dy="0">Eficiência</tspan></text>
+<text x="210.0" y="236.5" text-anchor="middle" font-size="11" fill="#241b3a" opacity="0.75" font-family="Segoe UI, sans-serif"><tspan x="210.0" dy="0">art. 37, caput, CF</tspan></text></svg>

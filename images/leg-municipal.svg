@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 190" width="620" height="190">
+<rect width="620" height="190" fill="#f5f3ff"/>
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+<path d="M0,0 L8,3 L0,6 Z" fill="#6d4bda"/>
+</marker>
+</defs>
+<text x="310.0" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#6d4bda" font-family="Segoe UI, sans-serif">Legislação Municipal de Curitiba</text><rect x="20" y="70" width="128" height="92" rx="12" fill="#ffffff" stroke="#6d4bda" stroke-width="2.5"/>
+<rect x="20" y="70" width="128" height="6" rx="3" fill="#6d4bda"/>
+<text x="84.0" y="108.0" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="84.0" dy="0">Lei Orgânica</tspan></text>
+<text x="84.0" y="132.0" text-anchor="middle" font-size="11" fill="#241b3a" opacity="0.75" font-family="Segoe UI, sans-serif"><tspan x="84.0" dy="0">&quot;Constituição&quot; do</tspan><tspan x="84.0" dy="14">Município</tspan></text><rect x="170.66666666666666" y="70" width="128" height="92" rx="12" fill="#ffffff" stroke="#17a673" stroke-width="2.5"/>
+<rect x="170.66666666666666" y="70" width="128" height="6" rx="3" fill="#17a673"/>
+<text x="234.66666666666666" y="108.0" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="234.66666666666666" dy="0">Lei 1.656/58</tspan></text>
+<text x="234.66666666666666" y="132.0" text-anchor="middle" font-size="11" fill="#241b3a" opacity="0.75" font-family="Segoe UI, sans-serif"><tspan x="234.66666666666666" dy="0">Estatuto dos Servidores</tspan></text><rect x="321.3333333333333" y="70" width="128" height="92" rx="12" fill="#ffffff" stroke="#e8673c" stroke-width="2.5"/>
+<rect x="321.3333333333333" y="70" width="128" height="6" rx="3" fill="#e8673c"/>
+<text x="385.3333333333333" y="108.0" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="385.3333333333333" dy="0">Lei 7.671/91</tspan></text>
+<text x="385.3333333333333" y="132.0" text-anchor="middle" font-size="11" fill="#241b3a" opacity="0.75" font-family="Segoe UI, sans-serif"><tspan x="385.3333333333333" dy="0">Organização do Executivo</tspan></text><rect x="472.0" y="70" width="128" height="92" rx="12" fill="#ffffff" stroke="#6d4bda" stroke-width="2.5"/>
+<rect x="472.0" y="70" width="128" height="6" rx="3" fill="#6d4bda"/>
+<text x="536.0" y="99.0" text-anchor="middle" font-size="13" font-weight="700" fill="#241b3a" font-family="Segoe UI, sans-serif"><tspan x="536.0" dy="0">Código</tspan><tspan x="536.0" dy="18">Tributário</tspan></text>
+<text x="536.0" y="141.0" text-anchor="middle" font-size="11" fill="#241b3a" opacity="0.75" font-family="Segoe UI, sans-serif"><tspan x="536.0" dy="0">IPTU, ITBI, ISSQN, taxas</tspan></text><line x1="148" y1="116.0" x2="170.66666666666666" y2="116.0" stroke="#6d4bda" stroke-width="2.5" marker-end="url(#arrow)"/><line x1="298.66666666666663" y1="116.0" x2="321.3333333333333" y2="116.0" stroke="#6d4bda" stroke-width="2.5" marker-end="url(#arrow)"/><line x1="449.3333333333333" y1="116.0" x2="472.0" y2="116.0" stroke="#6d4bda" stroke-width="2.5" marker-end="url(#arrow)"/></svg>

@@ -22,6 +22,7 @@
       <button class="tab-btn" data-tab="dashboard">📊 Painel</button>
       <button class="tab-btn" data-tab="flashcards">🗂️ Flashcards livres</button>
       <button class="tab-btn" data-tab="quiz">📝 Questões livres</button>
+      <button class="tab-btn" data-tab="provas">🏛️ Provas reais FAFIPA</button>
       <button class="tab-btn" data-tab="pomodoro">⏱️ Foco livre</button>
       <button class="tab-btn" data-tab="cronograma">📅 Cronograma</button>
       <button class="tab-btn" data-tab="dicas">💡 Dicas (TDAH)</button>
@@ -103,6 +104,13 @@
       <div id="quiz-area"></div>
     </section>
 
+    <!-- PROVAS REAIS FAFIPA -->
+    <section class="panel" id="panel-provas">
+      <h2>Questões reais da FAFIPA, comentadas</h2>
+      <p class="muted" id="provas-aviso"></p>
+      <div id="provas-area"></div>
+    </section>
+
     <!-- POMODORO -->
     <section class="panel" id="panel-pomodoro">
       <div class="pomodoro-wrap">
@@ -148,6 +156,7 @@
 
 <script src="data.js"></script>
 <script src="theory.js"></script>
+<script src="provas-fafipa.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

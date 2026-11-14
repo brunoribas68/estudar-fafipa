@@ -1,3 +1,52 @@
+/* ===================== VOZ (leitura em voz alta) =====================
+   Usa a síntese de voz nativa do navegador (Web Speech API) em vez de um
+   serviço de nuvem: funciona 100% offline, não depende de internet, e usa
+   a melhor voz em português já instalada no seu computador — em Windows/Mac
+   modernos isso costuma ser bem natural. */
+const TTS_SUPPORTED = typeof window!=="undefined" && "speechSynthesis" in window;
+let ttsVoices = [];
+if(TTS_SUPPORTED){
+  function loadVoices(){ ttsVoices = window.speechSynthesis.getVoices(); }
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickPtVoice(){
+  const pt = ttsVoices.filter(v=>v.lang && v.lang.toLowerCase().startsWith("pt"));
+  if(!pt.length) return null;
+  const natural = pt.find(v=>/natural|online|neural|google/i.test(v.name));
+  const br = pt.find(v=>v.lang.toLowerCase()==="pt-br");
+  return natural || br || pt[0];
+}
+function htmlToPlainText(html){
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent.replace(/\s+/g," ").trim();
+}
+function speakText(text, btn){
+  if(!TTS_SUPPORTED){ alert("Seu navegador não tem suporte a leitura em voz alta."); return; }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "pt-BR";
+  const v = pickPtVoice();
+  if(v) utter.voice = v;
+  utter.rate = 0.97;
+  utter.pitch = 1.0;
+  if(btn){
+    utter.onstart = ()=>{ btn.textContent = "⏸️ Parar leitura"; };
+    utter.onend = ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; };
+    utter.onerror = ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; };
+  }
+  window.speechSynthesis.speak(utter);
+}
+function toggleSpeak(html, btn){
+  if(window.speechSynthesis.speaking){
+    window.speechSynthesis.cancel();
+    btn.textContent = "🔊 Ouvir este conteúdo";
+    return;
+  }
+  speakText(htmlToPlainText(html), btn);
+}
+
 /* ===================== STORAGE ===================== */
 const STORE_KEY = "fafipa_estudos_v1";
 function loadStore(){
@@ -45,6 +94,7 @@ function showTab(tab){
   if(tab==="trilha") renderTrilha();
   if(tab==="flashcards") renderFlashcardPanel();
   if(tab==="quiz") renderQuizPanel();
+  if(tab==="provas") renderProvasFafipa();
   if(tab==="dashboard") renderDashboard();
   if(tab==="cronograma") renderCronograma();
   if(tab==="dicas") renderDicas();
@@ -142,8 +192,13 @@ function goToNextStep(entry){
 
 function renderStepTeoria(content, entry){
   const txt = TEORIA[entry.materia] || "<p>Sem material de teoria cadastrado para este dia — siga para a prática.</p>";
+  const img = IMAGENS[entry.materia];
   content.innerHTML = `
-    <div class="theory-box">${txt}</div>
+    ${img ? `<div class="theory-image"><img src="images/${img}" alt="Diagrama de apoio — ${MATERIA_LABEL[entry.materia]||''}" /></div>` : ""}
+    <div class="theory-box">
+      <button class="speak-btn" id="speak-theory">🔊 Ouvir este conteúdo</button>
+      ${txt}
+    </div>
     <div class="mini-timer" id="mini-timer">
       <span class="mt-display" id="mt-display">12:00</span>
       <span class="mt-label">Quer cronometrar a leitura? Opcional — não precisa usar.</span>
@@ -155,7 +210,8 @@ function renderStepTeoria(content, entry){
       <button class="btn-primary" id="step-next">Já li, continuar →</button>
     </div>`;
   initMiniTimer();
-  document.getElementById("step-next").addEventListener("click", ()=> goToNextStep(entry));
+  document.getElementById("speak-theory").addEventListener("click", (e)=> toggleSpeak(txt, e.target));
+  document.getElementById("step-next").addEventListener("click", ()=>{ window.speechSynthesis.cancel(); goToNextStep(entry); });
 }
 
 function renderStepFlashcards(content, entry){
@@ -188,6 +244,7 @@ function renderStepFlashcards(content, entry){
       <div class="deck-progress" style="text-align:center;">Card ${idx+1} de ${queue.length}</div>
       <div class="flashcard" id="mf-card">
         <span class="tag">${MATERIA_LABEL[card.materia]}</span>
+        <button class="speak-mini" id="mf-speak">🔊</button>
         <div class="face" id="mf-face">${card.pergunta}</div>
         <div class="hint">clique para ver a resposta</div>
       </div>
@@ -196,6 +253,10 @@ function renderStepFlashcards(content, entry){
         <button class="grade-btn grade-ok" data-g="1">Médio</button>
         <button class="grade-btn grade-easy" data-g="2">Fácil</button>
       </div>`;
+    document.getElementById("mf-speak").addEventListener("click", (e)=>{
+      e.stopPropagation();
+      speakText(htmlToPlainText(shown ? card.resposta : card.pergunta));
+    });
     document.getElementById("mf-card").addEventListener("click", ()=>{
       if(shown) return; shown=true;
       document.getElementById("mf-face").innerHTML = card.resposta;
@@ -255,6 +316,13 @@ function renderStepQuiz(content, entry){
     });
     wrap.appendChild(el);
   });
+  if(entry.materia==="dir-tributario"){
+    const note = document.createElement("p");
+    note.className = "muted";
+    note.style.textAlign = "center";
+    note.innerHTML = `💡 Tem questões <strong>reais da FAFIPA</strong> sobre esse assunto — veja na aba "🏛️ Provas reais FAFIPA".`;
+    wrap.appendChild(note);
+  }
   document.getElementById("step-next").addEventListener("click", ()=> goToNextStep(entry));
 }
 
@@ -401,6 +469,7 @@ function renderFlashcardPanel(){
     <div class="deck-progress">Card ${flashIdx+1} de ${flashQueue.length}</div>
     <div class="flashcard" id="flip-card">
       <span class="tag">${MATERIA_LABEL[card.materia]}</span>
+      <button class="speak-mini" id="flip-speak">🔊</button>
       <div class="face" id="card-face">${card.pergunta}</div>
       <div class="hint">clique para ver a resposta</div>
     </div>
@@ -409,6 +478,10 @@ function renderFlashcardPanel(){
       <button class="grade-btn grade-ok" data-g="1">Médio</button>
       <button class="grade-btn grade-easy" data-g="2">Fácil</button>
     </div>`;
+  document.getElementById("flip-speak").addEventListener("click", (e)=>{
+    e.stopPropagation();
+    speakText(htmlToPlainText(flashShowingAnswer ? card.resposta : card.pergunta));
+  });
   document.getElementById("flip-card").addEventListener("click", ()=>{
     if(flashShowingAnswer) return;
     flashShowingAnswer = true;
@@ -477,6 +550,37 @@ function renderQuizPanel(){
       });
     });
     area.appendChild(el);
+  });
+}
+
+/* ===================== PROVAS REAIS FAFIPA ===================== */
+function renderProvasFafipa(){
+  document.getElementById("provas-aviso").innerHTML =
+    `São poucas as provas da FAFIPA publicamente disponíveis para cargos de fiscal tributário municipal.
+    As questões abaixo vêm de uma prova real e recente da própria banca (FAFIPA 2025 — Prefeitura de
+    Jaguapitã/PR — Agente Fiscal Tributário), reconstruídas a partir do PDF oficial. Onde o gabarito
+    preliminar do PDF saiu ilegível, isso está dito na explicação, e a resposta foi conferida direto no CTN.`;
+  const wrap = document.getElementById("provas-area");
+  wrap.innerHTML = "";
+  PROVAS_FAFIPA.forEach(q=>{
+    const el = document.createElement("div");
+    el.className = "quiz-item";
+    el.innerHTML = `<span class="quiz-tag">🔵 ${q.fonte}</span>
+      <div class="quiz-q">${q.enunciado}</div>
+      <div class="quiz-opts">${q.opcoes.map((op,i)=>`<button class="quiz-opt" data-i="${i}">${String.fromCharCode(65+i)}) ${op}</button>`).join("")}</div>
+      <div class="quiz-explain" id="exp-${q.id}">${q.explicacao}</div>`;
+    el.querySelectorAll(".quiz-opt").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        if(el.dataset.answered) return;
+        el.dataset.answered = "1";
+        const i = parseInt(btn.dataset.i,10);
+        const correct = i===q.correta;
+        btn.classList.add(correct?"correct":"wrong");
+        if(!correct) el.querySelectorAll(".quiz-opt")[q.correta].classList.add("correct");
+        document.getElementById("exp-"+q.id).classList.add("show");
+      });
+    });
+    wrap.appendChild(el);
   });
 }
 
