@@ -158,7 +158,6 @@ select,input[type=text],input[type=number]{font-family:inherit;font-size:14px;pa
 .step-title-main{text-align:center;font-size:19px;font-weight:700;margin-bottom:18px;}
 .theory-image{text-align:center;margin-bottom:14px;}
 .theory-image img{max-width:100%;border-radius:12px;background:var(--bg-2);border:1px solid var(--card-border);box-shadow:var(--shadow);}
-.speak-btn{display:block;margin:0 0 14px auto;background:var(--primary);color:#fff;border:none;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;}
 .speak-mini{position:absolute;top:10px;right:14px;background:none;border:1px solid var(--card-border);border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer;color:var(--primary);}
 .flashcard{position:relative;}
 .theory-box{background:var(--bg-2);border:1px solid var(--card-border);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow);line-height:1.65;font-size:15px;}
@@ -169,6 +168,20 @@ select,input[type=text],input[type=number]{font-family:inherit;font-size:14px;pa
 .theory-box .atencao strong{color:var(--accent-2);}
 .theory-box .exemplo{background:rgba(23,166,115,.08);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:14px;}
 .theory-box .exemplo strong{color:var(--accent);}
+/* palavras-chave em destaque — pensado pra escaneabilidade (TDAH): o olho acha o
+   essencial sem precisar reler o parágrafo inteiro. */
+.theory-box mark.hl{background:rgba(232,103,60,.28);color:var(--ink);padding:1px 4px;border-radius:4px;font-weight:700;}
+.theory-box mark.hl-prazo{background:none;color:var(--primary);font-weight:700;border-bottom:2px solid var(--primary);padding:0 1px;}
+
+/* ===== player de áudio (barra de progresso + velocidade + play/pause) ===== */
+.audio-player{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--card-border);border-radius:12px;padding:8px 12px;margin:0 0 14px;box-shadow:var(--shadow);}
+.ap-btn{border:none;cursor:pointer;flex-shrink:0;}
+.ap-playpause{background:var(--primary);color:#fff;width:36px;height:36px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.ap-progress{flex:1;height:8px;border-radius:6px;background:var(--card-border);cursor:pointer;position:relative;overflow:hidden;}
+.ap-progress.disabled{cursor:default;opacity:.5;}
+.ap-progress-fill{height:100%;width:0%;background:var(--primary);border-radius:6px;}
+.ap-time{font-size:12px;color:var(--muted);white-space:nowrap;min-width:82px;text-align:right;}
+.ap-speed{background:var(--card-border);color:var(--ink);font-weight:700;font-size:12px;padding:6px 10px;border-radius:8px;min-width:40px;}
 .step-nav{display:flex;justify-content:space-between;margin-top:18px;}
 .mini-step-area{max-width:560px;margin:0 auto;}
 .complete-box{text-align:center;padding:40px 20px;}

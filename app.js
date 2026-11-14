@@ -47,51 +47,122 @@ function toggleSpeak(html, btn){
   speakText(htmlToPlainText(html), btn);
 }
 
-/* ===================== ÁUDIO GRAVADO (voz natural, gerada 1x) =====================
-   Dois provedores em paralelo pra comparar qualidade — cada um grava numa pasta própria
-   (veja tools/generate-audio.js para o Gemini e tools/generate-audio-elevenlabs.js para a
-   ElevenLabs). O app tenta cada um na ordem desta lista; o primeiro que tiver o arquivo pra
-   aquela matéria é o que toca. Pra trocar de preferência (ex.: só ElevenLabs), basta reordenar
-   ou remover itens aqui. Se nenhum provedor tiver áudio pra uma matéria ainda, cai pra voz do
-   navegador (toggleSpeak) — pior, mas sempre funciona. */
+/* ===================== PLAYER DE ÁUDIO (barra de progresso, velocidade, play/pause) =====
+   Dois provedores de áudio gravado em paralelo pra comparar qualidade — cada um numa pasta
+   própria (veja tools/generate-audio.js para o Gemini e tools/generate-audio-elevenlabs.js
+   para a ElevenLabs). O player tenta cada um nesta ordem; o primeiro que tiver o arquivo pra
+   aquela matéria é o que toca, com barra de progresso clicável (pra pular pra qualquer ponto)
+   e controle de velocidade. Se nenhum provedor tiver áudio ainda pra uma matéria, cai pra voz
+   do navegador — sem barra de progresso (a Web Speech API não permite isso), mas com
+   play/pause e velocidade do mesmo jeito. */
 const AUDIO_PROVIDERS = [
   { name: "elevenlabs", ext: "mp3" },
   { name: "gemini", ext: "wav" }
 ];
+const SPEED_STEPS = [0.75, 1, 1.25, 1.5, 2];
 let theoryAudioEl = null;
 function stopTheoryAudio(){
   if(theoryAudioEl){ theoryAudioEl.pause(); theoryAudioEl = null; }
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
 }
-function toggleTheoryAudio(materia, html, btn){
-  if(theoryAudioEl && !theoryAudioEl.paused){
-    stopTheoryAudio();
-    btn.textContent = "🔊 Ouvir este conteúdo";
-    return;
-  }
-  if(window.speechSynthesis && window.speechSynthesis.speaking){
-    window.speechSynthesis.cancel();
-    btn.textContent = "🔊 Ouvir este conteúdo";
-    return;
-  }
-  btn.textContent = "⏳ Carregando áudio...";
-  tryAudioProvider(0, materia, html, btn);
+function formatTime(s){
+  if(!isFinite(s) || s < 0) s = 0;
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, "0")}`;
 }
-function tryAudioProvider(idx, materia, html, btn){
-  if(idx >= AUDIO_PROVIDERS.length){
-    // nenhum provedor tinha áudio gravado pra esta matéria — usa a voz do navegador
-    toggleSpeak(html, btn);
-    return;
+function buildAudioPlayer(materia, html){
+  const wrap = document.createElement("div");
+  wrap.className = "audio-player";
+  wrap.innerHTML = `
+    <button class="ap-btn ap-playpause" title="Tocar/pausar">▶️</button>
+    <div class="ap-progress disabled"><div class="ap-progress-fill"></div></div>
+    <span class="ap-time">0:00</span>
+    <button class="ap-btn ap-speed" title="Velocidade">1x</button>`;
+  const playBtn = wrap.querySelector(".ap-playpause");
+  const progress = wrap.querySelector(".ap-progress");
+  const fill = wrap.querySelector(".ap-progress-fill");
+  const timeEl = wrap.querySelector(".ap-time");
+  const speedBtn = wrap.querySelector(".ap-speed");
+
+  let mode = null;   // "audio" (arquivo gravado) ou "tts" (voz do navegador)
+  let audio = null;
+  let speedIdx = 1;   // 1x
+  let ttsPlaying = false;
+
+  function applySpeed(){
+    speedBtn.textContent = SPEED_STEPS[speedIdx] + "x";
+    if(audio) audio.playbackRate = SPEED_STEPS[speedIdx];
   }
-  const { name, ext } = AUDIO_PROVIDERS[idx];
-  const audio = new Audio(`audio/${name}/teoria-${materia}.${ext}`);
-  theoryAudioEl = audio;
-  audio.addEventListener("playing", ()=>{ btn.textContent = "⏸️ Parar leitura"; });
-  audio.addEventListener("ended", ()=>{ btn.textContent = "🔊 Ouvir este conteúdo"; theoryAudioEl = null; });
-  audio.addEventListener("error", ()=>{
-    theoryAudioEl = null;
-    tryAudioProvider(idx + 1, materia, html, btn);
+  speedBtn.addEventListener("click", ()=>{
+    speedIdx = (speedIdx + 1) % SPEED_STEPS.length;
+    applySpeed();
+    // na voz do navegador a velocidade só vale pra próxima leitura (a API não troca em tempo real)
+    if(mode === "tts" && ttsPlaying) speakWithControls();
   });
-  audio.play().catch(()=>{});
+
+  function speakWithControls(){
+    if(!TTS_SUPPORTED){ alert("Seu navegador não tem suporte a leitura em voz alta."); return; }
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(htmlToPlainText(html));
+    utter.lang = "pt-BR";
+    const v = pickPtVoice();
+    if(v) utter.voice = v;
+    utter.rate = SPEED_STEPS[speedIdx];
+    utter.onstart = ()=>{ ttsPlaying = true; playBtn.textContent = "⏸️"; };
+    utter.onend = ()=>{ ttsPlaying = false; playBtn.textContent = "▶️"; };
+    utter.onerror = ()=>{ ttsPlaying = false; playBtn.textContent = "▶️"; };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function tryAudioProvider(idx){
+    if(idx >= AUDIO_PROVIDERS.length){
+      mode = "tts";
+      speakWithControls();
+      return;
+    }
+    const { name, ext } = AUDIO_PROVIDERS[idx];
+    const a = new Audio(`audio/${name}/teoria-${materia}.${ext}`);
+    a.playbackRate = SPEED_STEPS[speedIdx];
+    a.addEventListener("loadedmetadata", ()=>{ timeEl.textContent = formatTime(a.duration); });
+    a.addEventListener("timeupdate", ()=>{
+      const pct = a.duration ? (a.currentTime / a.duration) * 100 : 0;
+      fill.style.width = pct + "%";
+      timeEl.textContent = `${formatTime(a.currentTime)} / ${formatTime(a.duration)}`;
+    });
+    a.addEventListener("ended", ()=>{ playBtn.textContent = "▶️"; fill.style.width = "0%"; });
+    a.addEventListener("error", ()=>{ tryAudioProvider(idx + 1); }, { once: true });
+    a.addEventListener("canplay", ()=>{
+      mode = "audio";
+      audio = a;
+      theoryAudioEl = a;
+      progress.classList.remove("disabled");
+      a.play();
+      playBtn.textContent = "⏸️";
+    }, { once: true });
+  }
+
+  playBtn.addEventListener("click", ()=>{
+    if(mode === "audio" && audio){
+      if(audio.paused){ audio.play(); playBtn.textContent = "⏸️"; }
+      else { audio.pause(); playBtn.textContent = "▶️"; }
+      return;
+    }
+    if(mode === "tts"){
+      if(ttsPlaying){ window.speechSynthesis.cancel(); ttsPlaying = false; playBtn.textContent = "▶️"; }
+      else speakWithControls();
+      return;
+    }
+    playBtn.textContent = "⏳";
+    tryAudioProvider(0);
+  });
+
+  progress.addEventListener("click", (e)=>{
+    if(mode !== "audio" || !audio || !audio.duration) return;
+    const rect = progress.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+  });
+
+  return wrap;
 }
 
 /* ===================== QUIZ ITEM (seleção + confirmação) =====================
@@ -292,10 +363,8 @@ function renderStepTeoria(content, entry){
   const img = IMAGENS[entry.materia];
   content.innerHTML = `
     ${img ? `<div class="theory-image"><img src="images/${img}" alt="Diagrama de apoio — ${MATERIA_LABEL[entry.materia]||''}" /></div>` : ""}
-    <div class="theory-box">
-      <button class="speak-btn" id="speak-theory">🔊 Ouvir este conteúdo</button>
-      ${txt}
-    </div>
+    <div id="theory-player-slot"></div>
+    <div class="theory-box">${txt}</div>
     <div class="mini-timer" id="mini-timer">
       <span class="mt-display" id="mt-display">12:00</span>
       <span class="mt-label">Quer cronometrar a leitura? Opcional — não precisa usar.</span>
@@ -307,8 +376,8 @@ function renderStepTeoria(content, entry){
       <button class="btn-primary" id="step-next">Já li, continuar →</button>
     </div>`;
   initMiniTimer();
-  document.getElementById("speak-theory").addEventListener("click", (e)=> toggleTheoryAudio(entry.materia, txt, e.target));
-  document.getElementById("step-next").addEventListener("click", ()=>{ window.speechSynthesis.cancel(); stopTheoryAudio(); goToNextStep(entry); });
+  document.getElementById("theory-player-slot").appendChild(buildAudioPlayer(entry.materia, txt));
+  document.getElementById("step-next").addEventListener("click", ()=>{ stopTheoryAudio(); goToNextStep(entry); });
 }
 
 function renderStepFlashcards(content, entry){
