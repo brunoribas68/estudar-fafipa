@@ -216,6 +216,7 @@ function buildQuizItem(q, opts){
       saveStore();
       if(typeof renderDashboard==="function") renderDashboard();
     }
+    if(typeof opts.onAnswered==="function") opts.onAnswered(correct);
   });
   return el;
 }
@@ -268,6 +269,7 @@ function showTab(tab){
   if(tab==="flashcards") renderFlashcardPanel();
   if(tab==="quiz") renderQuizPanel();
   if(tab==="provas") renderProvasFafipa();
+  if(tab==="simulado") renderSimuladoSetup();
   if(tab==="dashboard") renderDashboard();
   if(tab==="cronograma") renderCronograma();
   if(tab==="dicas") renderDicas();
@@ -430,7 +432,6 @@ function renderStepFlashcards(content, entry){
       <div class="deck-progress" style="text-align:center;">Card ${idx+1} de ${queue.length}</div>
       <div class="flashcard" id="mf-card">
         <span class="tag">${MATERIA_LABEL[card.materia]}</span>
-        <button class="speak-mini" id="mf-speak">🔊</button>
         <div class="face" id="mf-face">${card.pergunta}</div>
         <div class="hint">clique para ver a resposta</div>
       </div>
@@ -439,10 +440,6 @@ function renderStepFlashcards(content, entry){
         <button class="grade-btn grade-ok" data-g="1">Médio</button>
         <button class="grade-btn grade-easy" data-g="2">Fácil</button>
       </div>`;
-    document.getElementById("mf-speak").addEventListener("click", (e)=>{
-      e.stopPropagation();
-      speakText(htmlToPlainText(shown ? card.resposta : card.pergunta));
-    });
     document.getElementById("mf-card").addEventListener("click", ()=>{
       if(shown) return; shown=true;
       document.getElementById("mf-face").innerHTML = card.resposta;
@@ -637,7 +634,6 @@ function renderFlashcardPanel(){
     <div class="deck-progress">Card ${flashIdx+1} de ${flashQueue.length}</div>
     <div class="flashcard" id="flip-card">
       <span class="tag">${MATERIA_LABEL[card.materia]}</span>
-      <button class="speak-mini" id="flip-speak">🔊</button>
       <div class="face" id="card-face">${card.pergunta}</div>
       <div class="hint">clique para ver a resposta</div>
     </div>
@@ -646,10 +642,6 @@ function renderFlashcardPanel(){
       <button class="grade-btn grade-ok" data-g="1">Médio</button>
       <button class="grade-btn grade-easy" data-g="2">Fácil</button>
     </div>`;
-  document.getElementById("flip-speak").addEventListener("click", (e)=>{
-    e.stopPropagation();
-    speakText(htmlToPlainText(flashShowingAnswer ? card.resposta : card.pergunta));
-  });
   document.getElementById("flip-card").addEventListener("click", ()=>{
     if(flashShowingAnswer) return;
     flashShowingAnswer = true;
@@ -712,6 +704,107 @@ function renderProvasFafipa(){
   PROVAS_FAFIPA.forEach(q=>{
     const el = buildQuizItem(q, {tag: "🔵 "+q.fonte, explainId: "exp-"+q.id, trackStats:false});
     wrap.appendChild(el);
+  });
+}
+
+/* ===================== SIMULADOS COMPLETOS ===================== */
+/* Gera simulados com N questões sorteadas do banco inteiro (QUIZZES), tentando
+   puxar um pouco de cada matéria pra cobrir o edital todo, não só repetir as
+   mesmas 2-3 matérias com mais questões. Pensado pra usar DEPOIS de terminar
+   de estudar a Trilha — gera quantos simulados diferentes quiser. */
+function shuffleArr(arr){
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+function sampleSimulado(n){
+  const materias = Object.keys(MATERIA_LABEL);
+  const perMateria = Math.max(1, Math.floor(n/materias.length));
+  const used = new Set();
+  const pool = [];
+  shuffleArr(materias.slice()).forEach(m=>{
+    const qs = shuffleArr(QUIZZES.filter(q=>q.materia===m));
+    qs.slice(0,perMateria).forEach(q=>{ if(!used.has(q.id)){ pool.push(q); used.add(q.id); } });
+  });
+  let resto = shuffleArr(QUIZZES.filter(q=>!used.has(q.id)));
+  while(pool.length<n && resto.length){ pool.push(resto.pop()); }
+  return shuffleArr(pool).slice(0,n);
+}
+
+let simuladoTimerInterval = null, simuladoSeconds = 0;
+function renderSimuladoSetup(){
+  clearInterval(simuladoTimerInterval); simuladoTimerInterval=null;
+  const total = QUIZZES.length;
+  const area = document.getElementById("simulado-area");
+  area.innerHTML = `
+    <div class="panel-header">
+      <h2>Simulados completos</h2>
+    </div>
+    <p class="muted">Monte um simulado com questões sorteadas de todas as matérias do edital, pra treinar depois de
+      terminar de estudar. Banco atual: <strong>${total} questões</strong> — dá pra gerar vários simulados diferentes
+      sem repetir muita coisa.</p>
+    <div class="simulado-config">
+      <label>Quantas questões?
+        <select id="sim-size">
+          <option value="10">10 (rápido)</option>
+          <option value="20" selected>20</option>
+          <option value="40">40 (prova completa)</option>
+          <option value="60">60 (máximo)</option>
+        </select>
+      </label>
+      <button class="btn-primary" id="sim-start">🚀 Gerar simulado</button>
+    </div>`;
+  document.getElementById("sim-start").addEventListener("click", ()=>{
+    const n = Math.min(total, parseInt(document.getElementById("sim-size").value,10));
+    startSimulado(n);
+  });
+}
+
+function startSimulado(n){
+  const list = sampleSimulado(n);
+  let answered = 0, correct = 0;
+  simuladoSeconds = 0;
+  const area = document.getElementById("simulado-area");
+  area.innerHTML = `
+    <div class="panel-header">
+      <h2>Simulado — ${list.length} questões</h2>
+      <div class="sim-timer" id="sim-timer">⏱ 00:00</div>
+    </div>
+    <div class="deck-progress" id="sim-progress">0 de ${list.length} respondidas</div>
+    <div id="sim-quiz-wrap"></div>
+    <div class="step-nav">
+      <button class="btn-ghost" id="sim-cancel">← Cancelar</button>
+      <button class="btn-primary" id="sim-finish">Finalizar simulado</button>
+    </div>`;
+  simuladoTimerInterval = setInterval(()=>{
+    simuladoSeconds++;
+    document.getElementById("sim-timer").textContent = "⏱ "+fmtTime(simuladoSeconds);
+  },1000);
+  const wrap = document.getElementById("sim-quiz-wrap");
+  list.forEach(q=>{
+    const el = buildQuizItem(q, {
+      tag: MATERIA_LABEL[q.materia],
+      explainId: "exp-sim-"+q.id,
+      trackStats: true,
+      onAnswered: (isCorrect)=>{
+        answered++; if(isCorrect) correct++;
+        document.getElementById("sim-progress").textContent = `${answered} de ${list.length} respondidas — ${correct} certas até agora`;
+      }
+    });
+    wrap.appendChild(el);
+  });
+  document.getElementById("sim-cancel").addEventListener("click", ()=>{ renderSimuladoSetup(); });
+  document.getElementById("sim-finish").addEventListener("click", ()=>{
+    clearInterval(simuladoTimerInterval); simuladoTimerInterval=null;
+    const pct = list.length ? Math.round((correct/list.length)*100) : 0;
+    const emoji = pct>=80 ? "🏆" : pct>=60 ? "🎉" : pct>=40 ? "💪" : "📚";
+    area.innerHTML = `<div class="complete-box">
+      <span class="big-emoji">${emoji}</span>
+      <h2>Resultado do simulado</h2>
+      <p class="muted">${correct} de ${list.length} corretas (${pct}%) — em ${fmtTime(simuladoSeconds)}.</p>
+      <p class="muted">${answered<list.length ? (list.length-answered)+" questão(ões) não respondida(s) não entraram na nota." : ""}</p>
+      <button class="btn-primary" id="sim-again">🚀 Gerar outro simulado</button>
+    </div>`;
+    document.getElementById("sim-again").addEventListener("click", ()=> renderSimuladoSetup());
   });
 }
 
