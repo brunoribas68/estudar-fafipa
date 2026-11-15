@@ -110,6 +110,8 @@ select,input[type=text],input[type=number]{font-family:inherit;font-size:14px;pa
 .quiz-opt.selected{border-color:var(--accent);background:rgba(28,176,246,.12);}
 .quiz-opt.correct{background:rgba(88,204,2,.15);border-color:var(--primary);color:var(--primary-dark);}
 .quiz-opt.wrong{background:rgba(255,75,75,.12);border-color:var(--warn);color:var(--warn-dark);}
+.quiz-item.quiz-unanswered{border-color:var(--warn);}
+.quiz-item.quiz-unanswered .quiz-tag::after{content:" · não respondida";color:var(--warn-dark);font-weight:700;}
 .quiz-opt:disabled{cursor:default;opacity:.9;}
 .quiz-confirm-row{margin-top:12px;text-align:right;}
 .quiz-confirm-btn{padding:10px 20px;border-radius:14px;border:none;font-weight:800;cursor:pointer;font-size:13px;background:var(--primary);color:#fff;box-shadow:0 4px 0 var(--primary-dark);transition:transform .08s,box-shadow .08s;text-transform:uppercase;letter-spacing:.03em;}

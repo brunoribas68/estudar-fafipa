@@ -218,6 +218,25 @@ function buildQuizItem(q, opts){
     }
     if(typeof opts.onAnswered==="function") opts.onAnswered(correct);
   });
+  // Força a revelação da resposta correta sem precisar de clique — usado no
+  // fim do simulado pra mostrar o gabarito comentado mesmo em questões que
+  // ficaram sem resposta. Não conta estatística nem chama onAnswered (a
+  // questão não foi de fato respondida pela pessoa).
+  el.reveal = function(){
+    if(el.dataset.answered) return;
+    el.dataset.answered = "1";
+    if(selected!==null){
+      const correct = selected===q.correta;
+      optBtns[selected].classList.remove("selected");
+      optBtns[selected].classList.add(correct?"correct":"wrong");
+    } else {
+      el.classList.add("quiz-unanswered");
+    }
+    optBtns[q.correta].classList.add("correct");
+    optBtns.forEach(b=>b.disabled=true);
+    confirmBtn.style.display = "none";
+    document.getElementById(explainId).classList.add("show");
+  };
   return el;
 }
 
@@ -268,7 +287,6 @@ function showTab(tab){
   if(tab==="trilha") renderTrilha();
   if(tab==="flashcards") renderFlashcardPanel();
   if(tab==="quiz") renderQuizPanel();
-  if(tab==="provas") renderProvasFafipa();
   if(tab==="simulado") renderSimuladoSetup();
   if(tab==="dashboard") renderDashboard();
   if(tab==="cronograma") renderCronograma();
@@ -699,20 +717,6 @@ function renderQuizPanel(){
   });
 }
 
-/* ===================== PROVAS REAIS FAFIPA ===================== */
-function renderProvasFafipa(){
-  document.getElementById("provas-aviso").innerHTML =
-    `São poucas as provas da FAFIPA publicamente disponíveis para cargos de fiscal tributário municipal.
-    As questões abaixo vêm de uma prova real e recente da própria banca (FAFIPA 2025 — Prefeitura de
-    Jaguapitã/PR — Agente Fiscal Tributário), reconstruídas a partir do PDF oficial. Onde o gabarito
-    preliminar do PDF saiu ilegível, isso está dito na explicação, e a resposta foi conferida direto no CTN.`;
-  const wrap = document.getElementById("provas-area");
-  wrap.innerHTML = "";
-  PROVAS_FAFIPA.forEach(q=>{
-    const el = buildQuizItem(q, {tag: "🔵 "+q.fonte, explainId: "exp-"+q.id, trackStats:false});
-    wrap.appendChild(el);
-  });
-}
 
 /* ===================== SIMULADOS COMPLETOS ===================== */
 /* Gera simulados com N questões sorteadas do banco inteiro (QUIZZES), tentando
@@ -723,16 +727,21 @@ function shuffleArr(arr){
   for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
   return arr;
 }
+/* banco completo usado nos simulados: QUIZZES (estilo FAFIPA) + as poucas
+   questões reais da própria banca (ver provas-fafipa.js) — assim essas
+   questões reais continuam aparecendo, só que misturadas nos simulados em
+   vez de terem uma aba própria. */
+const SIMULADO_BANK = QUIZZES.concat(typeof PROVAS_FAFIPA!=="undefined" ? PROVAS_FAFIPA : []);
 function sampleSimulado(n){
   const materias = Object.keys(MATERIA_LABEL);
   const perMateria = Math.max(1, Math.floor(n/materias.length));
   const used = new Set();
   const pool = [];
   shuffleArr(materias.slice()).forEach(m=>{
-    const qs = shuffleArr(QUIZZES.filter(q=>q.materia===m));
+    const qs = shuffleArr(SIMULADO_BANK.filter(q=>q.materia===m));
     qs.slice(0,perMateria).forEach(q=>{ if(!used.has(q.id)){ pool.push(q); used.add(q.id); } });
   });
-  let resto = shuffleArr(QUIZZES.filter(q=>!used.has(q.id)));
+  let resto = shuffleArr(SIMULADO_BANK.filter(q=>!used.has(q.id)));
   while(pool.length<n && resto.length){ pool.push(resto.pop()); }
   return shuffleArr(pool).slice(0,n);
 }
@@ -740,7 +749,7 @@ function sampleSimulado(n){
 let simuladoTimerInterval = null, simuladoSeconds = 0;
 function renderSimuladoSetup(){
   clearInterval(simuladoTimerInterval); simuladoTimerInterval=null;
-  const total = QUIZZES.length;
+  const total = SIMULADO_BANK.length;
   const area = document.getElementById("simulado-area");
   area.innerHTML = `
     <div class="panel-header">
@@ -787,9 +796,10 @@ function startSimulado(n){
     document.getElementById("sim-timer").textContent = "⏱ "+fmtTime(simuladoSeconds);
   },1000);
   const wrap = document.getElementById("sim-quiz-wrap");
+  const items = [];
   list.forEach(q=>{
     const el = buildQuizItem(q, {
-      tag: MATERIA_LABEL[q.materia],
+      tag: q.fonte ? "🔵 "+q.fonte : MATERIA_LABEL[q.materia],
       explainId: "exp-sim-"+q.id,
       trackStats: true,
       onAnswered: (isCorrect)=>{
@@ -798,20 +808,30 @@ function startSimulado(n){
       }
     });
     wrap.appendChild(el);
+    items.push(el);
   });
   document.getElementById("sim-cancel").addEventListener("click", ()=>{ renderSimuladoSetup(); });
   document.getElementById("sim-finish").addEventListener("click", ()=>{
     clearInterval(simuladoTimerInterval); simuladoTimerInterval=null;
+    // revela o gabarito em toda questão que ficou sem resposta, pra sobrar
+    // uma revisão comentada completa (as já respondidas já mostram explicação).
+    items.forEach(el=>el.reveal());
     const pct = list.length ? Math.round((correct/list.length)*100) : 0;
     const emoji = pct>=80 ? "🏆" : pct>=60 ? "🎉" : pct>=40 ? "💪" : "📚";
-    area.innerHTML = `<div class="complete-box">
+    const naoRespondidas = list.length-answered;
+    const resultBox = document.createElement("div");
+    resultBox.className = "complete-box";
+    resultBox.innerHTML = `
       <span class="big-emoji">${emoji}</span>
       <h2>Resultado do simulado</h2>
       <p class="muted">${correct} de ${list.length} corretas (${pct}%) — em ${fmtTime(simuladoSeconds)}.</p>
-      <p class="muted">${answered<list.length ? (list.length-answered)+" questão(ões) não respondida(s) não entraram na nota." : ""}</p>
-      <button class="btn-primary" id="sim-again">🚀 Gerar outro simulado</button>
-    </div>`;
+      <p class="muted">${naoRespondidas>0 ? naoRespondidas+" questão(ões) não respondida(s), contadas como erro — o gabarito de todas está logo abaixo." : "Revisão comentada de todas as questões abaixo."}</p>
+      <button class="btn-primary" id="sim-again">🚀 Gerar outro simulado</button>`;
+    area.querySelector(".panel-header").insertAdjacentElement("afterend", resultBox);
+    document.getElementById("sim-progress").remove();
+    area.querySelector(".step-nav").remove();
     document.getElementById("sim-again").addEventListener("click", ()=> renderSimuladoSetup());
+    resultBox.scrollIntoView({behavior:"smooth", block:"start"});
   });
 }
 
