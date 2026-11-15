@@ -10,6 +10,27 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+<!-- QUEM ESTÁ ESTUDANDO (seletor de pessoa, salvo num banco SQLite local) -->
+<div id="person-gate" class="person-gate">
+  <div class="person-gate-card">
+    <h2>👋 Quem está estudando?</h2>
+    <p class="muted">Seu progresso (trilha, flashcards, questões, simulados) fica salvo separado por pessoa, num banco local no seu navegador.</p>
+    <div id="person-gate-list" class="person-chip-list"></div>
+    <div class="person-gate-form">
+      <input type="text" id="person-gate-input" placeholder="Digite seu nome" maxlength="40" />
+      <button class="btn-primary" id="person-gate-enter">Entrar</button>
+    </div>
+    <p class="muted person-gate-status" id="person-gate-status">Carregando banco de dados…</p>
+    <div class="person-gate-actions">
+      <button class="btn-ghost" id="person-export-btn">⬇️ Exportar backup (.db)</button>
+      <label class="btn-ghost person-import-label">⬆️ Importar backup (.db)
+        <input type="file" id="person-import-input" accept=".db,.sqlite" style="display:none;" />
+      </label>
+    </div>
+  </div>
+</div>
+
 <div id="app">
 
   <header class="topbar">
@@ -19,6 +40,10 @@
         <h1>Painel de Estudos</h1>
         <p>Auditor Fiscal de Tributos Municipais — Curitiba (FAFIPA)</p>
       </div>
+    </div>
+    <div class="person-badge" id="person-badge" style="display:none;">
+      <span id="person-badge-name"></span>
+      <button id="person-switch-btn" class="btn-ghost" title="Trocar de pessoa / exportar backup">⚙️ Trocar</button>
     </div>
     <nav class="tabs" id="tabs">
       <button class="tab-btn active" data-tab="trilha">🎮 Trilha</button>
@@ -157,7 +182,9 @@
 
 <script src="data.js"></script>
 <script src="theory.js"></script>
+<script src="vendor/sql-wasm-inline.js"></script>
 <script src="provas-fafipa.js"></script>
 <script src="app.js"></script>
+<script src="db.js"></script>
 </body>
 </html>

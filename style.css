@@ -231,3 +231,36 @@ select,input[type=text],input[type=number]{font-family:inherit;font-size:14px;pa
 .dicas-content h3{margin-top:0;}
 .dicas-content ul{line-height:1.7;}
 .dicas-content .source{font-size:12px;color:var(--muted);margin-top:10px;font-weight:700;}
+
+/* ===================== QUEM ESTÁ ESTUDANDO (gate de pessoa / SQLite) ===================== */
+.person-gate{
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(20,24,20,.55);
+  padding:20px;
+}
+.person-gate-card{
+  background:var(--bg-2);border:2px solid var(--card-border);border-radius:var(--radius);
+  box-shadow:0 8px 0 rgba(0,0,0,.08),0 10px 24px rgba(0,0,0,.12);
+  max-width:420px;width:100%;padding:28px 26px;text-align:center;
+}
+.person-gate-card h2{margin:0 0 8px;font-size:21px;}
+.person-gate-card .muted{font-size:13px;color:var(--muted);font-weight:700;line-height:1.5;margin:0 0 16px;}
+.person-chip-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px;min-height:0;}
+.person-chip{
+  padding:9px 16px;border-radius:999px;border:2px solid var(--card-border);background:var(--bg);
+  color:var(--ink);font-weight:800;font-size:13px;cursor:pointer;font-family:'Baloo 2',sans-serif;
+  box-shadow:0 3px 0 var(--card-border);transition:transform .08s,box-shadow .08s;
+}
+.person-chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--card-border);}
+.person-chip.active{border-color:var(--primary);color:var(--primary-dark);box-shadow:0 3px 0 var(--primary);}
+.person-gate-form{display:flex;gap:8px;margin-bottom:10px;}
+.person-gate-form input{flex:1;min-width:0;}
+.person-gate-status{min-height:16px;}
+.person-gate-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;padding-top:14px;border-top:1px solid var(--card-border);}
+.person-gate-actions .btn-ghost,.person-import-label{font-size:11px;padding:9px 14px;}
+.person-import-label{display:inline-flex;align-items:center;cursor:pointer;border-radius:14px;}
+
+.person-badge{display:flex;align-items:center;gap:10px;margin:0 0 14px;flex-wrap:wrap;}
+.person-badge span{font-weight:800;font-size:14px;font-family:'Baloo 2',sans-serif;color:var(--ink);}
+.person-badge .btn-ghost{padding:7px 14px;font-size:11px;}

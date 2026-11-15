@@ -1,3 +1,8 @@
+/* Todo o app só é montado depois que o db.js resolve qual pessoa está
+   estudando (ver vendor/sql-wasm-inline.js + db.js) — assim STORE já nasce
+   carregado com o progresso certo em vez de ter que recarregar no meio. */
+function startApp(){
+
 /* ===================== VOZ (leitura em voz alta) =====================
    Usa a síntese de voz nativa do navegador (Web Speech API) em vez de um
    serviço de nuvem: funciona 100% offline, não depende de internet, e usa
@@ -240,24 +245,20 @@ function buildQuizItem(q, opts){
   return el;
 }
 
-/* ===================== STORAGE ===================== */
-const STORE_KEY = "fafipa_estudos_v1";
-function loadStore(){
-  try{
-    const raw = localStorage.getItem(STORE_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){ /* storage unavailable (private mode etc) */ }
-  return {
-    cards: {},       // id -> {due, interval, reps}
-    quizStats: {attempted:0, correct:0, byId:{}},
-    streak: {count:0, lastDay:null},
-    cyclesToday: {day:null, count:0},
-  };
-}
+/* ===================== STORAGE =====================
+   O progresso (cards, quiz, streak, dias concluídos) é salvo por pessoa no
+   banco SQLite local gerenciado pelo db.js (window.FAFIPA_DB) — startApp()
+   só roda depois que o db.js já escolheu/carregou a pessoa, então STORE
+   abaixo já vem com os dados certos dela. */
 function saveStore(){
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }catch(e){ /* ignore */ }
+  if(window.FAFIPA_DB) window.FAFIPA_DB.setStore(STORE);
 }
-let STORE = loadStore();
+let STORE = (window.FAFIPA_DB && window.FAFIPA_DB.getStore()) || {
+  cards: {},       // id -> {due, interval, reps}
+  quizStats: {attempted:0, correct:0, byId:{}},
+  streak: {count:0, lastDay:null},
+  cyclesToday: {day:null, count:0},
+};
 
 function todayStr(){
   const d = new Date();
@@ -946,3 +947,5 @@ function renderDicas(){
 /* ===================== INIT ===================== */
 renderDashboard();
 renderTrilha();
+
+} // fim de startApp()
