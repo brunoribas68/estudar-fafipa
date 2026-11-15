@@ -60,6 +60,56 @@ const MATERIA_LABEL = {
   "governanca":"Governança"
 };
 
+/* ===================== LINKS EXTERNOS ("Para saber mais") =====================
+   Material de apoio fora do app (artigos e vídeos) pra fixar o conteúdo lendo/
+   vendo de outra fonte, além da teoria daqui. `parte` é opcional — só filtra o
+   link pras matérias divididas em várias partes (ver `entry.parte`); sem
+   `parte`, o link aparece em qualquer dia daquela matéria.
+   Todos os links abaixo foram verificados manualmente antes de entrar aqui —
+   se algum link cair (site reestruturado, página removida), me avise que eu
+   troco. */
+const LINKS_EXTERNOS = {
+  portugues: [
+    {parte:1, titulo:"Estratégia Concursos — A importância da coesão para construir um texto de qualidade", url:"https://www.estrategiaconcursos.com.br/blog/a-importancia-da-coesao-para-construir-um-texto-de-qualidade/", tipo:"artigo"},
+  ],
+  informatica: [
+    {titulo:"Estratégia Concursos — Tipos de backup (incremental x completo)", url:"https://www.estrategiaconcursos.com.br/blog/tipos-backup/", tipo:"artigo"},
+  ],
+  "dir-constitucional": [
+    {parte:1, titulo:"STF — 'Direito sem juridiquês': entenda o que são os remédios constitucionais", url:"https://noticias.stf.jus.br/postsnoticias/explica-ai-stf-entenda-o-que-sao-os-remedios-constitucionais/", tipo:"artigo"},
+  ],
+  "dir-administrativo": [
+    {parte:1, titulo:"Estratégia Concursos — Resumo de atos administrativos", url:"https://www.estrategiaconcursos.com.br/blog/resumo-de-atos-administrativos/", tipo:"artigo"},
+  ],
+  raciocinio: [
+    {titulo:"Estratégia Concursos — Juros simples e compostos", url:"https://www.estrategiaconcursos.com.br/blog/juros-simples-compostos/", tipo:"artigo"},
+  ],
+  "dir-tributario": [
+    {parte:2, titulo:"Estratégia Concursos — Decadência e prescrição no Direito Tributário, aplicações em concurso", url:"https://www.estrategiaconcursos.com.br/blog/decadencia-e-prescricao-no-direito-tributario-aplicacoes-em-concurso/", tipo:"artigo"},
+  ],
+  issqn: [
+    {titulo:"Foco Tributário — Mudanças na LC 116/2003 quanto ao local da incidência do ISS", url:"https://focotributario.com.br/116-mudancas-na-lc-116-2003-quanto-ao-local-da-incidencia-do-iss/", tipo:"artigo"},
+  ],
+  "demais-tributos": [
+    {titulo:"Jus.com.br — O ITBI: principais questões", url:"https://jus.com.br/artigos/1401/o-imposto-sobre-a-transmissao-de-bens-imoveis-itbi-principais-questoes", tipo:"artigo"},
+  ],
+  "pat-reforma": [
+    {titulo:"Estratégia Concursos — Resumo sobre a Reforma Tributária (EC 132/2023)", url:"https://www.estrategiaconcursos.com.br/blog/resumo-sobre-ec-132-2023/", tipo:"artigo"},
+  ],
+  contabilidade: [
+    {titulo:"Estratégia Concursos — Demonstração do Resultado do Exercício (DRE)", url:"https://www.estrategiaconcursos.com.br/blog/demonstracao-do-resultado-do-exercicio-dre/", tipo:"artigo"},
+  ],
+  "contab-publica": [
+    {titulo:"Jus.com.br — PPA, LDO e LOA: leis da gestão fiscal no Brasil", url:"https://jus.com.br/artigos/114279/leis-orcamentarias-o-pilar-do-planejamento-e-controle-economico-no-brasil", tipo:"artigo"},
+  ],
+  "civil-empresarial": [
+    {titulo:"Sebrae — MEI ou Simples Nacional: entenda as diferenças", url:"https://sebraepr.com.br/comunidade/artigo/mei-ou-simples-nacional-entenda-as-diferencas-para-o-empreendedor", tipo:"artigo"},
+  ],
+  "penal-lrf": [
+    {titulo:"Jus.com.br — Crimes contra a ordem tributária (Lei nº 8.137/90)", url:"https://jus.com.br/artigos/51197/crimes-contra-a-ordem-tributaria-lei-n-8137-90", tipo:"artigo"},
+  ],
+};
+
 /* ===================== FLASHCARDS ===================== */
 // grade usa SM-2 simplificado: 0=difícil,1=médio,2=fácil
 let idc = 1;

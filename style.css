@@ -189,6 +189,12 @@ select,input[type=text],input[type=number]{font-family:inherit;font-size:14px;pa
 .theory-box .atencao strong{color:var(--accent-2-dark);}
 .theory-box .exemplo{background:rgba(88,204,2,.08);border-left:4px solid var(--primary);padding:10px 14px;border-radius:0 12px 12px 0;margin:10px 0;font-size:14px;}
 .theory-box .exemplo strong{color:var(--primary-dark);}
+.saiba-mais{background:var(--bg-2);border:2px dashed var(--card-border);border-radius:var(--radius);padding:14px 20px;margin-top:14px;}
+.saiba-mais h3{margin:0 0 8px;font-size:15px;font-family:'Baloo 2',sans-serif;color:var(--accent-dark,var(--accent));}
+.saiba-mais ul{margin:0;padding-left:20px;}
+.saiba-mais li{margin-bottom:4px;}
+.saiba-mais a{color:var(--accent);font-weight:700;text-decoration:none;}
+.saiba-mais a:hover{text-decoration:underline;}
 /* palavras-chave em destaque — pensado pra escaneabilidade (TDAH): o olho acha o
    essencial sem precisar reler o parágrafo inteiro. */
 .theory-box mark.hl{background:rgba(255,200,0,.45);color:var(--ink);padding:1px 4px;border-radius:5px;font-weight:800;}

@@ -379,10 +379,17 @@ function renderStepTeoria(content, entry){
   const audioId = Array.isArray(raw) && entry.parte ? `${entry.materia}-parte${entry.parte}` : entry.materia;
   const imgRaw = IMAGENS[entry.materia];
   const img = Array.isArray(imgRaw) ? (imgRaw[(entry.parte||1) - 1] || imgRaw[imgRaw.length-1]) : imgRaw;
+  // material extra (artigos/vídeos) pra fixar o conteúdo lendo de outra fonte —
+  // só mostra links da parte certa, ou sem `parte` (valem pra matéria toda).
+  const links = (LINKS_EXTERNOS[entry.materia]||[]).filter(l=>!l.parte || l.parte===entry.parte);
   content.innerHTML = `
     ${img ? `<div class="theory-image"><img src="images/${img}" alt="Diagrama de apoio — ${MATERIA_LABEL[entry.materia]||''}" /></div>` : ""}
     <div id="theory-player-slot"></div>
     <div class="theory-box">${txt}</div>
+    ${links.length ? `<div class="saiba-mais">
+      <h3>📚 Para saber mais</h3>
+      <ul>${links.map(l=>`<li><a href="${l.url}" target="_blank" rel="noopener noreferrer">${l.titulo}</a></li>`).join("")}</ul>
+    </div>` : ""}
     <div class="mini-timer" id="mini-timer">
       <span class="mt-display" id="mt-display">12:00</span>
       <span class="mt-label">Quer cronometrar a leitura? Opcional — não precisa usar.</span>
