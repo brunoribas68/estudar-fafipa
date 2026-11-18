@@ -40,9 +40,19 @@
     return btoa(bin);
   }
 
+  let avisouFalhaSalvar = false;
   function persistDb(){
-    try{ localStorage.setItem(LS_DB_KEY, bytesToB64(db.export())); }
-    catch(e){ /* ignore — segue funcionando só na memória desta sessão */ }
+    try{
+      localStorage.setItem(LS_DB_KEY, bytesToB64(db.export()));
+    }catch(e){
+      // localStorage indisponível/bloqueado ou sem espaço — avisa uma vez só,
+      // pra não incomodar a cada ação, mas garante que a pessoa saiba que o
+      // progresso não está sendo salvo entre sessões.
+      if(!avisouFalhaSalvar){
+        avisouFalhaSalvar = true;
+        alert("Não consegui salvar seu progresso neste navegador (" + e.message + "). Use \"⬇️ Exportar backup\" ao terminar de estudar para não perder nada.");
+      }
+    }
   }
 
   function ensureSchema(){
@@ -57,6 +67,14 @@
   function listPessoas(){
     const res = db.exec("SELECT nome FROM pessoas ORDER BY atualizado_em DESC");
     return res.length ? res[0].values.map(r=>r[0]) : [];
+  }
+
+  // Acha o nome já cadastrado que corresponde a "nome" ignorando maiúsculas/
+  // minúsculas e espaços nas pontas (ex.: digitar "bruno" ou "Bruno " deve
+  // achar o perfil já existente "Bruno" em vez de criar um novo do zero).
+  function findExistingName(nome){
+    const alvo = nome.trim().toLowerCase();
+    return listPessoas().find(n => n.trim().toLowerCase() === alvo) || null;
   }
 
   function defaultStore(){
@@ -134,6 +152,7 @@
     selectPerson(nome){
       nome = (nome||"").trim();
       if(!nome) return;
+      nome = findExistingName(nome) || nome; // reusa o perfil já existente, se houver
       const switching = window.__FAFIPA_STARTED__ && nome !== currentPerson;
       activate(nome);
       if(!window.__FAFIPA_STARTED__){
@@ -199,7 +218,11 @@
       statusEl.textContent = "Não consegui carregar o banco de dados local — o progresso não vai ser salvo nesta sessão.";
       return;
     }
-    const savedB64 = localStorage.getItem(LS_DB_KEY);
+
+    let savedB64 = null, storageBlocked = false;
+    try{ savedB64 = localStorage.getItem(LS_DB_KEY); }
+    catch(e){ storageBlocked = true; }
+
     if(savedB64){
       try{ db = new SQL.Database(b64ToBytes(savedB64)); }
       catch(e){ db = new SQL.Database(); }
@@ -207,11 +230,22 @@
       db = new SQL.Database();
     }
     ensureSchema();
-    statusEl.textContent = "";
 
-    const lastPerson = localStorage.getItem(LS_PERSON_KEY);
     const known = listPessoas();
     renderGateList();
+
+    if(storageBlocked){
+      // o navegador bloqueou localStorage (ex.: modo privado/restrições de
+      // privacidade) — o app funciona, mas nada vai ficar salvo ao fechar.
+      statusEl.textContent = "⚠️ Seu navegador está bloqueando o salvamento local — o progresso não vai persistir ao fechar a página. Exporte um backup ao terminar.";
+    } else {
+      statusEl.textContent = known.length
+        ? `${known.length} perfil${known.length>1?'s':''} salvo${known.length>1?'s':''} neste navegador.`
+        : "";
+    }
+
+    let lastPerson = null;
+    try{ lastPerson = localStorage.getItem(LS_PERSON_KEY); }catch(e){ /* ignore */ }
     if(lastPerson && known.includes(lastPerson)){
       activate(lastPerson);
       window.__FAFIPA_STARTED__ = true;
