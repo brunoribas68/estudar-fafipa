@@ -16,6 +16,13 @@
      o app entra direto na trilha dela — só pede o nome de novo se for a
      primeira vez, se o navegador foi limpo, ou se a pessoa clicar em
      "⚙️ Trocar" pra trocar/criar outro perfil.
+   - Pra levar progresso de um navegador/computador pra outro (ex.: duas
+     pessoas estudando, cada uma no seu aparelho), cada pessoa exporta só o
+     PRÓPRIO progresso como um arquivo .json pequeno (ex.: progresso-bruno.json)
+     e sobe no git/GitHub — como é um arquivo por pessoa, nunca dá conflito
+     de merge (cada um só toca no próprio arquivo). A outra pessoa dá um git
+     pull e importa esse .json; ele só atualiza/cria aquela pessoa no banco,
+     sem apagar ninguém mais que já esteja salvo ali.
    - app.js inteiro agora está dentro de uma função startApp(), que só é
      chamada por aqui, depois que a pessoa certa já foi carregada. */
 
@@ -164,32 +171,44 @@
         location.reload();
       }
     },
-    exportDb(){
-      persistDb();
-      const blob = new Blob([db.export()], {type:"application/x-sqlite3"});
+    exportPersonJSON(){
+      if(!currentPerson){ alert("Escolha uma pessoa antes de exportar."); return; }
+      const payload = {
+        nome: currentPerson,
+        store: currentStore,
+        exportado_em: new Date().toISOString(),
+      };
+      const slug = currentPerson.trim().toLowerCase()
+        .replace(/[^a-z0-9áàâãéèêíïóôõöúçñ\s-]/g,"")
+        .replace(/\s+/g,"-");
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "estudos-fafipa.db";
+      a.download = "progresso-"+slug+".json";
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
     },
-    importDb(file){
+    importPersonJSON(file){
       const reader = new FileReader();
       reader.onload = function(){
-        try{
-          db = new SQL.Database(new Uint8Array(reader.result));
-          ensureSchema();
-          persistDb();
-          alert("Backup importado! A página vai recarregar.");
-          location.reload();
-        }catch(e){
-          alert("Não consegui ler esse arquivo como backup válido: "+e.message);
+        let payload;
+        try{ payload = JSON.parse(reader.result); }
+        catch(e){ alert("Não consegui ler esse arquivo como progresso válido: "+e.message); return; }
+        if(!payload || typeof payload.nome !== "string" || !payload.nome.trim() || !payload.store){
+          alert("Esse arquivo não parece ser um progresso exportado pelo app.");
+          return;
         }
+        const nome = findExistingName(payload.nome) || payload.nome.trim();
+        upsertStoreFor(nome, payload.store); // só cria/atualiza essa pessoa, não toca nas outras
+        if(nome === currentPerson) currentStore = payload.store;
+        renderGateList();
+        alert(`Progresso de "${nome}" importado!`+(nome===currentPerson ? " A página vai recarregar." : ""));
+        if(nome === currentPerson) location.reload();
       };
-      reader.readAsArrayBuffer(file);
+      reader.readAsText(file);
     }
   };
 
@@ -202,10 +221,10 @@
       if(e.key==="Enter"){ e.preventDefault(); document.getElementById("person-gate-enter").click(); }
     });
     document.getElementById("person-switch-btn").addEventListener("click", showGate);
-    document.getElementById("person-export-btn").addEventListener("click", ()=> window.FAFIPA_DB.exportDb());
+    document.getElementById("person-export-btn").addEventListener("click", ()=> window.FAFIPA_DB.exportPersonJSON());
     document.getElementById("person-import-input").addEventListener("change", (e)=>{
       const f = e.target.files[0];
-      if(f) window.FAFIPA_DB.importDb(f);
+      if(f) window.FAFIPA_DB.importPersonJSON(f);
     });
   }
 
